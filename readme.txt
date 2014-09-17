@@ -1,5 +1,5 @@
 === Plugin Name ===
-Contributors: CoursePress
+Contributors: wpmudev
 Tags: elearning, lms, education, courses, lessons, assignments, students, teachers
 Requires at least: 4.0
 Tested up to: 4.0
