@@ -7,6 +7,10 @@ Author: Marko Miljus ( Incsub ) / Rheinard Korf ( Incsub )
 -------------------------------------------------
 * Resolved issues with wrong pre_get_posts filtering within the admin
 
+= 1.0.7 = 
+-------------------------------------------------
+* Resolved issues with wrong pre_get_posts filtering within the admin
+
 = 1.0.6 = 
 -------------------------------------------------
 * Improved security
