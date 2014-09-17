@@ -61,6 +61,13 @@ Easily add beautiful courses to your WordPress install or Multisite network.
 
 == Screenshots ==
 
+1. All the elements you need to create a great course
+2. Your courses have never looked so good
+3. Real-time interaction with Chat
+4. Will your course have a six figure launch?
+5. Offer certification with your courses with grading, marking and assessment tools
+6. Display and promote your courses however you like
+
 == Changelog ==
 
 = 1.0.6 = 
