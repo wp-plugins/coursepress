@@ -32,7 +32,6 @@ Use the official built-in CoursePress theme to get rolling quickly or the comple
 
 = Level-up with CoursePress Pro =
 
-<blockquote>
 While CoursePress is suitable for offering a few courses, you may have bigger goals for your site. [CoursePress Pro](http://premium.wpmudev.org/project/coursepress-pro "Create, manage and sell online courses in WordPress") takes the features you love from CoursePress and unlocks the ability to create an unlimited number of courses. Plus get over 12 payment gateways making it even easier to accept payments for your premium content.
 
 Check out all the goodies bundled in CoursePress Pro:
@@ -52,7 +51,6 @@ Check out all the goodies bundled in CoursePress Pro:
 * Offer genuinely assessed certification
 * Live [Chat](https://premium.wpmudev.org/project/wordpress-chat-plugin/ "The best stand-alone live chat WordPress plugin") integration for real-time interaction
 * And it works great with Multisite
-</blockquote>
 
 Easily add beautiful courses to your WordPress install or Multisite network.
 
