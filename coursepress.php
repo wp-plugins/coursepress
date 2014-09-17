@@ -438,7 +438,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 			$ajax_response = array();
 
 			// Same file regardless of Lite or full version of MP
-			$result = activate_plugin( 'coursepress/marketpress.php' );
+			$result = activate_plugin( 'coursepress/a-marketpress.php' );
 
 			if ( is_wp_error( $result ) ) {
 				$ajax_response[ 'mp_lite_activated' ] = false;
@@ -1921,12 +1921,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 						include_once( $this->plugin_dir . 'includes/unit-modules/' . $mem_module );
 				}
 			}
-
-			// Not sure if this is a good idea.
-			// if ( !$this->is_marketpress_active() && !$this->is_marketpress_lite_active() && !$this->is_marketpress_lite_active() ) {
-			//     $this->install_and_activate_plugin('/' . $this->dir_name . '/marketpress.php');
-			// }
-
 
 			do_action( 'coursepress_modules_loaded' );
 		}
@@ -3806,7 +3800,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				$active_sitewide_plugins = array();
 			}
 
-			if ( preg_grep( '/marketpress.php/', $plugins ) || preg_grep( '/marketpress.php/', $active_sitewide_plugins ) ) {
+			if ( preg_grep( '/marketpress.php/', $plugins ) || preg_grep( '/marketpress.php/', $active_sitewide_plugins ) || preg_grep( '/a-marketpress.php/', $plugins ) || preg_grep( '/a-marketpress.php/', $active_sitewide_plugins ) ) {
 				return true;
 			} else {
 				return false;
