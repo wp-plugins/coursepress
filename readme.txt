@@ -56,6 +56,15 @@ Easily add beautiful courses to your WordPress install or Multisite network.
 
 == Installation ==
 
+To Install:
+Download the CoursePress plugin file
+Unzip the file into a folder on your hard drive
+Upload the /coursepress/ folder to the /wp-content/plugins/ folder on your site
+Visit your Dashboard -> Plugins and Activate it there.
+
+= To Set Up And Configure CoursePress = 
+You can find [in-depth setup and usage instructions with screenshots here »](http://premium.wpmudev.org/project/coursepress-pro/#usage "CoursePress plugin installation and usage help")
+
 1. Unzip and Upload `coursepress` directory to the `/wp-content/plugins/` directory
 2. Activate the plugin through the 'Plugins' menu in WordPress
 
