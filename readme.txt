@@ -78,6 +78,10 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.0.7 = 
+-------------------------------------------------
+* Resolved issues with wrong pre_get_posts filtering within the admin
+
 = 1.0.6 = 
 -------------------------------------------------
 * Improved security
