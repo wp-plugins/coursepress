@@ -3,6 +3,7 @@
 MarketPress BP Features
 */
 
+if ( ! class_exists('MarketPress_BP') ) :
 class MarketPress_BP {
 
   function __construct() {
@@ -16,3 +17,4 @@ class MarketPress_BP {
 
 }
 $mp_bp = &new MarketPress_BP();
+endif;

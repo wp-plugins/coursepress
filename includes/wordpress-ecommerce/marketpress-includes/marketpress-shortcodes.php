@@ -2,7 +2,7 @@
 /*
 MarketPress Shortcode Support
 */
-
+if ( ! class_exists('MarketPress_Shortcodes') ) :
 class MarketPress_Shortcodes {
 
   function __construct() {
@@ -347,3 +347,4 @@ class MarketPress_Shortcodes {
 
 }
 $mp_shortcodes = new MarketPress_Shortcodes();
+endif;

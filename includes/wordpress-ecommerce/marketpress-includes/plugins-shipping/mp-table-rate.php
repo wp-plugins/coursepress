@@ -5,6 +5,7 @@ Author: Nick Bunn (Salty Dog Interactive for Incsub)
 Version: 1.1
 */
 
+if ( ! class_exists('MP_Shipping_Table_Rate') ) :
 class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	
 	//private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
@@ -323,8 +324,8 @@ class MP_Shipping_Table_Rate extends MP_Shipping_API {
 	
 		return $price;
 	}
-
 }
+endif;
 
 //register plugin - uncomment to register
 mp_register_shipping_plugin( 'MP_Shipping_Table_Rate', 'table-rate', __('Table Rate', 'mp') );

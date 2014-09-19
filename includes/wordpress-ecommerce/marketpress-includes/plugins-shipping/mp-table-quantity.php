@@ -6,6 +6,7 @@ Based on table-rate plugin by Nick Bunn (Salty Dog Interactive)
 Version: 1.0
 */
 
+if ( ! class_exists('MP_Shipping_Table_Quantity') ) :
 class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 
   //private shipping method name. Lowercase alpha (a-z) and dashes (-) only please!
@@ -192,8 +193,8 @@ class MP_Shipping_Table_Quantity extends MP_Shipping_API {
 
     return $price;
   }
-
 }
+endif;
 
 //register plugin - uncomment to register
 //mp_register_shipping_plugin( 'MP_Shipping_Table_Quantity', 'table-quantity', __('Table Quantity', 'mp') );

@@ -6,6 +6,7 @@ MarketPress Importers
 /*
  * Parent class to extend
  */
+if ( ! class_exists('MarketPress_Importer') ) :
 class MarketPress_Importer {
   var $importer_name = '';
 	var $results;
@@ -59,8 +60,8 @@ class MarketPress_Importer {
 	function process() {
 		
 	}
-
 }
+endif;
 
 /* ------------------------------------------------------------------ */
 /* ----------------------- Begin Importers -------------------------- */
@@ -69,6 +70,7 @@ class MarketPress_Importer {
 /*
  * WP e-Commerce Plugin Importer
  */
+if ( ! class_exists('WP_eCommerceImporter') ) :
 class WP_eCommerceImporter extends MarketPress_Importer {
 
 	var $importer_name = 'WP e-Commerce';
@@ -207,11 +209,12 @@ class WP_eCommerceImporter extends MarketPress_Importer {
 }
 //only load if the plugin is active and installed
 $mp_wpecommerce = new WP_eCommerceImporter();
-
+endif;
 
 /*
  * CSV Importer
  */
+if ( ! class_exists('CsvImporter') ) :
 class CsvImporter extends MarketPress_Importer {
 
 	var $importer_name = 'CSV';
@@ -493,3 +496,4 @@ class CsvImporter extends MarketPress_Importer {
 }
 //only load if the plugin is active and installed
 $mp_csv = new CsvImporter();
+endif;

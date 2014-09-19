@@ -13,6 +13,14 @@
   return $url;
   } */
 
+function cp_can_see_unit_draft(){
+	if(  current_user_can( 'manage_options') || current_user_can( 'coursepress_create_course_unit_cap' )){
+		return true;
+	}else{
+		return false;
+	}
+}
+
 function cp_user_can_register() {
     if ( is_multisite() ) {
         return users_can_register_signup_filter();
@@ -1261,7 +1269,7 @@ if ( !function_exists('cp_register_front_page_module') ) {
 if ( !function_exists('cp_write_log') ) {
 
     function cp_write_log( $message, $echo_file = false ) {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+		$trace = defined('DEBUG_BACKTRACE_IGNORE_ARGS') ? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS) : debug_backtrace(FALSE);
         $exception = new Exception();
         $debug = array_shift($trace);
         $caller = array_shift($trace);
@@ -1663,4 +1671,51 @@ function cp_minify_output( $buffer ) {
     );
     $buffer = preg_replace($search, $replace, $buffer);
     return $buffer;
+}
+
+function cp_get_file_size( $url, $human = true ) {
+	
+	// If its not a path... its probably a URL
+	if ( ! preg_match( '/^\//', $url ) ) {
+		$header = wp_remote_get( $url );
+		if( !is_wp_error( $header ) ) {
+			$bytes = $header['headers']['content-length'];		
+		} else {
+			$bytes = 0;
+		}
+	} else {
+		$bytes = filesize( $url );
+		$bytes = ! empty( $bytes ) ? $bytes : 0;
+	}
+	return $human ? cp_format_file_size( $bytes ) : $bytes;
+}
+
+function cp_format_file_size( $bytes )
+    {
+        if ($bytes >= 1073741824)
+        {
+            $bytes = number_format($bytes / 1073741824, 2) . ' GB';
+        }
+        elseif ($bytes >= 1048576)
+        {
+            $bytes = number_format($bytes / 1048576, 2) . ' MB';
+        }
+        elseif ($bytes >= 1024)
+        {
+            $bytes = number_format($bytes / 1024, 2) . ' KB';
+        }
+        elseif ($bytes > 1)
+        {
+            $bytes = $bytes . ' bytes';
+        }
+        elseif ($bytes == 1)
+        {
+            $bytes = $bytes . ' byte';
+        }
+        else
+        {
+            $bytes = '0 bytes';
+        }
+
+        return $bytes;
 }

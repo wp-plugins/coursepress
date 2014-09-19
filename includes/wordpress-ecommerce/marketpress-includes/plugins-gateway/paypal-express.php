@@ -4,6 +4,7 @@ MarketPress PayPal Express Gateway Plugin
 Author: Aaron Edwards (Incsub)
 */
 
+if ( ! class_exists('MP_Gateway_Paypal_Express') ) :
 class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
@@ -1116,6 +1117,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 
 		$nvpstr  = '&TOKEN=' . urlencode($token);
 	  $nvpstr .= '&PAYERID=' . urlencode($payer_id);
+		$nvpstr .= '&BUTTONSOURCE=incsub_SP';
 		$nvpstr .= $_SESSION['nvpstr'];
 
 	  /* Make the call to PayPal to finalize payment
@@ -1215,6 +1217,7 @@ class MP_Gateway_Paypal_Express extends MP_Gateway_API {
 	}
 
 }
+endif;
 
 //register shipping plugin
 mp_register_gateway_plugin( 'MP_Gateway_Paypal_Express', 'paypal-express', __('PayPal Express Checkout', 'mp'), true );

@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: CoursePress\n"
+"Project-Id-Version: CoursePress Pro\n"
 "POT-Creation-Date: 2014-09-14 23:58+1000\n"
 "PO-Revision-Date: 2014-09-14 23:59+1000\n"
 "Last-Translator: Rheinard Korf <rheinard@thekorfs.com>\n"

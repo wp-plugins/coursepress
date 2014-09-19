@@ -78,6 +78,18 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.0.9 =
+* Resolved issue with details button on courses archive and inconsistent shortcode used
+
+= 1.0.8 = 
+-------------------------------------------------
+* Upgraded MarketPress Bundle to 2.9.5.3
+* Added warning message (for admins) to the course overview page if "anyone can register" is not selected
+* Fixed issue with instructor capabilities settings and saving
+* Fixes possible issues with rewrite rules formating and avoid 404s
+* Fixed issue with non-protected discussions for students who didn't enroll to the course
+* Fixed issue with visibility of the draft units for admins and instructors
+
 = 1.0.7 = 
 -------------------------------------------------
 * Resolved issues with wrong pre_get_posts filtering within the admin

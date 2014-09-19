@@ -421,7 +421,7 @@ class CoursePress_Capabilities {
 	}
 	
 	/**
-	 * Is this CoursePress?
+	 * Is this CoursePress Pro?
 	 *
 	 * @since 1.0.0
 	 *

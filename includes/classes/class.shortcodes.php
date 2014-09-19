@@ -985,7 +985,6 @@ if ( !class_exists('CoursePress_Shortcodes') ) {
                             ), $atts, 'course_list_image'));
 
             $course_id = ( int ) $course_id;
-            $label = sanitize_text_field($label);
             $width = sanitize_html_class($width);
             $height = sanitize_html_class($height);
             $class = sanitize_html_class($class);
@@ -2105,6 +2104,7 @@ if ( !class_exists('CoursePress_Shortcodes') ) {
 
             $completion = new Course_Completion($course_id);
             $completion->init_student_status();
+
             return $completion->unit_progress($unit_id);
         }
 
@@ -2718,7 +2718,7 @@ if ( !class_exists('CoursePress_Shortcodes') ) {
             $args = array(
                 'order' => 'ASC',
                 'post_type' => 'unit',
-                'post_status' => 'publish',
+                'post_status' => (cp_can_see_unit_draft() ? 'any' : 'publish'),
                 'meta_key' => 'unit_order',
                 'orderby' => 'meta_value_num',
                 'posts_per_page' => '-1',
@@ -3072,26 +3072,19 @@ if ( !class_exists('CoursePress_Shortcodes') ) {
             }
 
             if ( $field == 'percent' ) {
+				
+	            $completion = new Course_Completion($unit->course_id);
+	            $completion->init_student_status();
+				$percent_value = $completion->unit_progress( $unit_id );
+
                 $assessable_input_modules_count = do_shortcode('[course_unit_details field="assessable_input_modules_count"]');
-                if ( $assessable_input_modules_count > 0 ) {
-                    if ( $style == 'flat' ) {
-                        $unit->details->$field = '<span class="percentage">' . ($format == true ? $percent_value . '%' : $percent_value) . '</span>';
-                    } else {
-                        $unit->details->$field = '<a class="tooltip" alt="' . $tooltip_alt . '"><input class="knob" data-fgColor="' . $knob_fg_color . '" data-bgColor="' . $knob_bg_color . '" data-thickness="' . $knob_data_thickness . '" data-width="' . $knob_data_width . '" data-height="' . $knob_data_height . '" data-readOnly=true value="' . $percent_value . '"></a>';
-                    }
+
+                if ( $style == 'flat' ) {
+                    $unit->details->$field = '<span class="percentage">' . ($format == true ? $percent_value . '%' : $percent_value) . '</span>';
                 } else {
-                    $unit_pages = $unit->get_number_of_unit_pages();
-                    $unit_pages_visited = cp_get_number_of_unit_pages_visited($unit_id);
-
-                    $percent_value = ( round(( 100 / $unit_pages ) * $unit_pages_visited, 0) );
-
-                    if ( $style == 'flat' ) {
-                        $unit->details->$field = '<span class="percentage">' . ($format == true ? $percent_value . '%' : $percent_value) . '</span>';
-                    } else {
-                        $unit->details->$field = '<a class="tooltip" alt="' . $tooltip_alt . '"><input class="knob" data-fgColor="' . $knob_fg_color . '" data-bgColor="' . $knob_bg_color . '" data-thickness="' . $knob_data_thickness . '" data-width="' . $knob_data_width . '" data-height="' . $knob_data_height . '" data-readOnly=true value="' . $percent_value . '"></a>';
-                    }
-                    //$unit->details->$field = '';
+                    $unit->details->$field = '<a class="tooltip" alt="' . $tooltip_alt . '"><input class="knob" data-fgColor="' . $knob_fg_color . '" data-bgColor="' . $knob_bg_color . '" data-thickness="' . $knob_data_thickness . '" data-width="' . $knob_data_width . '" data-height="' . $knob_data_height . '" data-readOnly=true value="' . $percent_value . '"></a>';
                 }
+                
             }
 
             if ( $field == 'permalink' ) {

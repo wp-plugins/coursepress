@@ -4,6 +4,7 @@ MarketPress Manual Payments Gateway Plugin
 Author: Aaron Edwards (Incsub)
 */
 
+if ( ! class_exists('MP_Gateway_ManualPayments') ) :
 class MP_Gateway_ManualPayments extends MP_Gateway_API {
 
   //private gateway slug. Lowercase alpha (a-z) and dashes (-) only please!
@@ -258,5 +259,6 @@ class MP_Gateway_ManualPayments extends MP_Gateway_API {
 
   }
 }
+endif;
 
 mp_register_gateway_plugin( 'MP_Gateway_ManualPayments', 'manual-payments', __('Manual Payments', 'mp') );

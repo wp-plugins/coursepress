@@ -353,5 +353,5 @@ class MP_Oembed {
 	}
 	
 }
-endif;
 $mp_ombed = new MP_Oembed();
+endif;

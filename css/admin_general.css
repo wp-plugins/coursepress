@@ -488,7 +488,16 @@ a.button.button-units.button-delete-unit:hover{
 	width: 320px;
 }
 
-.limited_courses_message{
+.assessment-archive-table span.uppercase.block a{
+    color: #0074a2;
+}
+
+.course_settings_enrollment_message{
+    width: 100%;
+    color: red;
     display: block;
+}
+
+.limited_courses_message{
     margin-bottom: 22px;
 }
