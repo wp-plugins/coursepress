@@ -36,8 +36,15 @@ if ( isset( $_POST['_wpnonce'] ) && current_user_can( 'manage_options' ) ) {
         } else {
             update_option( 'use_custom_login_form', 0 );
         }
+		
+		if ( isset( $_POST['redirect_students_to_dashboard'] ) ) {
+            update_option( 'redirect_students_to_dashboard', 1 );
+        } else {
+            update_option( 'redirect_students_to_dashboard', 0 );
+        }
         
-        flush_rewrite_rules();
+		// Conditional flush_rewrite_rules
+        cp_flush_rewrite_rules();
     }
 }
 ?>

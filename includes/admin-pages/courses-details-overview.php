@@ -186,6 +186,14 @@ if ( isset( $_GET[ 'course_id' ] ) ) {
 // MarketPress 2.x and MarketPress Lite
 $mp_settings = get_option( 'mp_settings' );
 $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
+
+/**
+ * Filter to enable or disable payable courses.
+ * 
+ * @since 1.2.1
+ */
+$offer_paid = apply_filters( 'coursepress_offer_paid_courses', true );
+
 ?>
 <div class='wrap nocoursesub cp-wrap'>
     <form action='<?php esc_attr_e( admin_url( 'admin.php?page=' . $page . ( ( $course_id !== 0 ) ? '&course_id=' . $course_id : '' ) . ( ( $course_id !== 0 ) ? '&ms=cu' : '&ms=ca' ) ) ); ?>' name='course-add' id='course-add' method='post'>
@@ -263,8 +271,12 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 										} else {
 											$not_limited = false;
 										}
+									}else{
+										$not_limited = true;
 									}
 								}
+								
+								
 
 								if ( (isset( $_GET[ 'course_id' ] )) || !isset( $_GET[ 'course_id' ] ) && $not_limited ) {
 									?>
@@ -473,8 +485,9 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 																		<li>
 																			<label for="course_<?php echo (!isset( $course ) || !empty( $course->details )) ? $course->details->ID : '0'; ?>"><?php echo (!isset( $course ) || !empty( $course->details ) && $course->details->post_title && $course->details->post_title !== '' ? $course->details->post_title : __( 'Course', 'cp' )); ?></label> <input type="checkbox" checked disabled id="course_<?php echo isset( $course->details ) ? $course->details->ID : ''; ?>" class="hidden_checkbox" /> 
 																			<?php
-																			$units	 = $course->get_units();
-
+																			$course_id = isset( $course ) && isset( $course->details ) && ! empty( $course->details->ID ) ? $course->details->ID : 0;
+																			$units = Unit::get_units_from_course( $course_id, 'any', false );
+																			$units = ! empty( $units ) ? $units : array();
 																			if ( 0 == count( $units ) ) {
 																				?>
 																				<ol>
@@ -936,7 +949,14 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 											$step_6_status	 = !$gateways && ( isset( $paid_course ) && $paid_course == 'on' ) ? 'attention' : $step_6_status;
 											?>
 											<div class="status <?php echo $step_6_status; ?> "></div>									
-											<h3><?php _e( 'Step 6 - Enrollment & Course Cost', 'cp' ) ?></h3>						
+											<?php
+												$section_title = __( 'Step 6 - Enrollment & Course Cost', 'cp' );
+												if( ! $offer_paid ) {
+													$section_title = __( 'Step 6 - Enrollment', 'cp' );
+												}
+												
+											?>
+											<h3><?php echo esc_html( $section_title ); ?></h3>						
 										</div>
 										<div class='course-form'>
 											<?php
@@ -1011,6 +1031,10 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 
 											</div>
 
+											<?php 
+											// Check to see if we're offering paid courses.
+											if( $offer_paid ) :
+											?>
 											<hr />
 											<?php // START ////////////////////////////////////////////////////////////////////////////////////////////////////////////                  ?>
 											<div class="narrow product">
@@ -1078,7 +1102,7 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 
 														<div class="course-price">
 															<span class="price-label <?php echo $paid_course == 'on' ? 'required' : ''; ?>"><?php _e( 'Price', 'cp' ); ?></span>
-															<input type="text" name="mp_price" id="mp_price" value="<?php echo (isset( $mp_product_details )) ? esc_attr( $mp_product_details[ "mp_price" ][ 0 ] ) : ''; ?>" <?php echo $input_state; ?>  />
+															<input type="text" name="mp_price" id="mp_price" value="<?php echo (isset( $mp_product_details ) && isset($mp_product_details[ 'mp_price' ])) ? esc_attr( $mp_product_details[ 'mp_price' ][ 0 ] ) : ''; ?>" <?php echo $input_state; ?>  />
 														</div>
 
 														<div class="clearfix"></div>
@@ -1110,10 +1134,12 @@ $gateways	 = !empty( $mp_settings[ 'gateways' ][ 'allowed' ] ) ? true : false;
 														</div>
 													</div>
 												</div> <!-- cp-markertpress-is-active -->												
-
-
 											</div>
 
+											<?php
+												// End check for Campus.
+											endif;
+											?>
 											<?php // END ///////////////////////////////                  ?>
 											<div class="course-step-buttons">
 												<input type="button" class="button button-units prev" value="<?php _e( 'Previous', 'cp' ); ?>" />

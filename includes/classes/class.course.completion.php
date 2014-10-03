@@ -40,6 +40,7 @@ if ( !class_exists('Course_Completion') ) {
         function __construct( $id = '', $output = 'OBJECT' ) {
             parent::__construct($id, $output);
             $units = $this->get_units();
+
             foreach ( $units as $key => $unit ) {
                 $this->unit_index[$unit->ID] = $key;
                 
@@ -314,6 +315,32 @@ if ( !class_exists('Course_Completion') ) {
                 $unit = $this->units[$this->unit_index[$unit_id]];
 
                 return count($unit->mandatory_module_ids) - $unit->remaining_mandatory_items;
+            }
+        }
+		
+        function unit_all_pages_viewed( $unit_id ) {
+
+            if ( !in_array($unit_id, array_keys($this->unit_index)) ) {
+                return false;
+            } else {
+
+                // Get the correct unit
+                $unit = $this->units[$this->unit_index[$unit_id]];
+
+                return $unit->all_pages_viewed;
+            }
+        }
+
+        function unit_all_mandatory_answered( $unit_id ) {
+
+            if ( !in_array($unit_id, array_keys($this->unit_index)) ) {
+                return false;
+            } else {
+
+                // Get the correct unit
+                $unit = $this->units[$this->unit_index[$unit_id]];
+
+                return $unit->all_mandatory_answered;
             }
         }
 

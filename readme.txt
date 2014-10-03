@@ -78,6 +78,38 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+== Changelog ==
+
+= 1.2.1.1 =
+* Added additional settings for controlling wp-login redirection
+* Fixed issue with "Instructor Capabilities" settings access as a student
+* Various database improvements. 
+* Added course progress display to student workbook.  
+* Added unit progress to CoursePress theme on student workbook.  
+* Added categories in the single post and blog archive
+* Fixed issue with hidden comment form when plugin is activated
+* Added passcode fields on login and signup popup forms
+* Minor changes to enrollment popup window. 
+
+= 1.2.1 =
+* Fixed issue with incorrectly displayed footer on student login page
+* Fixed issue with BuddyPress autocomplete on Compose Message page
+* Added a number of hooks in the main CoursePress class
+
+= 1.2 =
+* Added Duplicate Course feature
+* Fixed issue with "units" slugs
+* Fixed jQuery conflicts with theme options in WPMU Dev themes  
+* Added Unit restriction options to avoid confusion between 'completed answers' and 'successfull/passed answers'.  
+* Fixed unit restriction checking on front end 'Units' page. Will now show restrictions required from previous unit.
+
+= 1.1.1 = 
+* Fixed issue with protection of the next unit when previous unit has set "User needs to complete current unit in order to access the next one"
+* Fixed bug with removing a Single Choice element from a Unit
+
+= 1.1.0 =
+* Fixed issue with course limits in PRO version
+
 = 1.0.9 =
 * Resolved issue with details button on courses archive and inconsistent shortcode used
 
@@ -88,7 +120,8 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 * Fixed issue with instructor capabilities settings and saving
 * Fixes possible issues with rewrite rules formating and avoid 404s
 * Fixed issue with non-protected discussions for students who didn't enroll to the course
-* Fixed issue with visibility of the draft units for admins and instructors
+* Fixed issue with visibility of the draft units for admins and instructors* Fixed up issues with course completion checking  
+* Added file size indicator next to downloadable files  
 
 = 1.0.7 = 
 -------------------------------------------------
@@ -102,6 +135,7 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 * Fixed: Course completion now calculates correctly
 * Resolved issue with incorrect saving of Single Line / Multiple Lines option in input text element
 * Added student username (and link to the student's profile) in the assessment column
+* Dynamic MarketPress path set
 
 = 1.0.5 =
 -------------------------------------------------
