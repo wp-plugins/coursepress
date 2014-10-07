@@ -6,7 +6,7 @@
   Author: WPMU DEV
   Author URI: http://premium.wpmudev.org
   Developers: Marko Miljus ( https://twitter.com/markomiljus ), Rheinard Korf ( https://twitter.com/rheinardkorf )
-  Version: 1.2.1.1
+  Version: 1.2.1.2
   TextDomain: cp
   Domain Path: /languages/
   WDP ID: 913071
@@ -61,7 +61,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $version = '1.2.1.1';
+		public $version = '1.2.1.2';
 
 		/**
 		 * Plugin friendly name.
@@ -69,7 +69,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $name = 'CoursePress';
+		public $name = 'CoursePress Pro';
 
 		/**
 		 * Plugin directory name.
@@ -144,6 +144,12 @@ if ( !class_exists( 'CoursePress' ) ) {
 			 * CoursePress Capabilities Class.
 			 */
 			require_once( $this->plugin_dir . 'includes/classes/class.coursepress-capabilities.php' );
+
+
+			/**
+			 * CoursePress WordPress compatibility hooks.
+			 */
+			require_once( $this->plugin_dir . 'includes/classes/class.coursepress-compatibility.php' );
 
 
 			if ( CoursePress_Capabilities::is_pro() && !CoursePress_Capabilities::is_campus() ) {
@@ -230,15 +236,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 				 * CoursePress Menu meta box.
 				 */
 				require_once( $this->plugin_dir . 'includes/classes/class.menumetabox.php' );
-
-				/**
-				 * Listen to dynamic editor requests.
-				 *
-				 * Used on unit page in admin.
-				 *
-				 * @since 1.0.0
-				 */
-				add_action( 'wp_ajax_dynamic_wp_editor', array( &$this, 'dynamic_wp_editor' ) );
 
 				/**
 				 * Add instructor to a course (AJAX).
@@ -358,7 +355,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				 * @since 1.0.0
 				 */
 				add_action( 'wp_ajax_cp_popup_email_exists', array( &$this, 'cp_popup_email_exists' ) );
-				
+
 				/**
 				 * Returns whether the course passcode is valid (AJAX).
 				 *
@@ -431,14 +428,16 @@ if ( !class_exists( 'CoursePress' ) ) {
 				 */
 				add_action( 'wp_ajax_cp_activate_mp_lite', array( &$this, 'activate_marketpress_lite' ) );
 
+
 				/**
-				 * Apply some styles to the WordPress editor (AJAX).
+				 * Hook WordPress Editor filters and actions.
 				 *
-				 * Keeps consistency across course setup and unit setup.
+				 * But do so with WordPress compatibility in mind. Therefore,
+				 * create a new action hook to be used by CoursePress_Compatibility().
 				 *
-				 * @since 1.0.0
+				 * @since 1.2.1
 				 */
-				add_filter( 'mce_css', array( &$this, 'mce_editor_style' ) );
+				do_action( 'coursepress_editor_compatibility' );
 
 				/**
 				 * Hook CoursePress admin initialization.
@@ -973,13 +972,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 			add_action( 'template_redirect', array( &$this, 'instructor_invite_confirmation' ) );
 
 			/**
-			 * Add keydown() event listener for WP Editor.
-			 *
-			 * @since 1.0.0
-			 */
-			add_filter( 'tiny_mce_before_init', array( &$this, 'init_tiny_mce_listeners' ) );
-
-			/**
 			 * MarketPress: Making it a little bit more friendly for non-physical goods (aka Courses).
 			 *
 			 * @since 1.0.0
@@ -1137,16 +1129,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 			$xmlResponse = new WP_Ajax_Response( $response );
 			$xmlResponse->send();
 			ob_end_flush();
-		}
-
-		function cp_format_TinyMCE( $in ) {
-			$in[ 'menubar' ]	 = false;
-			$in[ 'plugins' ]	 = 'wplink, textcolor, hr';
-			$in[ 'toolbar1' ]	 = 'bold, italic, underline, blockquote, hr, strikethrough, bullist, numlist, subscript, superscript, alignleft, aligncenter, alignright, alignjustify, outdent, indent, link, unlink, forecolor, backcolor, undo, redo, removeformat, formatselect, fontselect, fontsizeselect';
-			$in[ 'toolbar2' ]	 = '';
-			$in[ 'toolbar3' ]	 = '';
-			$in[ 'toolbar4' ]	 = '';
-			return $in;
 		}
 
 		function course_checkout_success_msg( $setting, $default ) {
@@ -1328,16 +1310,16 @@ if ( !class_exists( 'CoursePress' ) ) {
 				exit;
 			}
 		}
-		
-		function cp_valid_passcode(){
+
+		function cp_valid_passcode() {
 			if ( isset( $_POST[ 'passcode' ] ) ) {
-				$course_id = $_POST['course_id'];
-				$course = new Course($course_id);
+				$course_id		 = $_POST[ 'course_id' ];
+				$course			 = new Course( $course_id );
 				$course_passcode = $course->details->passcode;
-				
-				if($course_passcode == $_POST['passcode']){
+
+				if ( $course_passcode == $_POST[ 'passcode' ] ) {
 					echo 'valid';
-				}else{
+				} else {
 					echo 'invalid';
 				}
 				exit;
@@ -1814,7 +1796,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				} else {
 					return true;
 				}
-			}else{
+			} else {
 				return $open;
 			}
 		}
@@ -1891,25 +1873,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 				echo wp_remote_retrieve_body( wp_remote_get( $requested_file ), array( 'timeout' => 60, 'user-agent' => $this->name . ' / ' . $this->version . ';' ) );
 				exit();
 			}
-		}
-
-		/* Retrieve wp_editor dynamically ( using in unit admin ) */
-
-		function dynamic_wp_editor() {
-
-			$editor_id = ( ( isset( $_GET[ 'rand_id' ] ) ? $_GET[ 'rand_id' ] : rand( 1, 9999 ) ) );
-
-			$args = array(
-				"textarea_name"	 => ( isset( $_GET[ 'module_name' ] ) ? $_GET[ 'module_name' ] : '' ) . "_content[]",
-				"textarea_rows"	 => 4,
-				"quicktags"		 => false,
-				"teeny"			 => true,
-				"editor_class"	 => 'cp-editor cp-dynamic-editor',
-			);
-
-			wp_editor( htmlspecialchars_decode( ( isset( $_GET[ 'editor_content' ] ) ? $_GET[ 'editor_content' ] : '' ) ), $editor_id, $args );
-
-			exit;
 		}
 
 		function load_plugin_templates() {
@@ -3666,62 +3629,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 			return $pg;
 		}
 
-		/**
-		 * Create a listener for TinyMCE change event
-		 *
-		 */
-		function init_tiny_mce_listeners( $initArray ) {
-
-			if ( is_admin() ) {
-				$detect_pages = array(
-					'coursepress_page_course_details',
-					'coursepress-pro_page_course_details',
-				);
-
-				$page	 = get_current_screen()->id;
-				$tab	 = empty( $_GET[ 'tab' ] ) ? '' : $_GET[ 'tab' ];
-
-				if ( in_array( $page, $detect_pages ) ) {
-					$initArray[ 'height' ]	 = '360px';
-					$initArray[ 'setup' ]	 = 'function( ed ) {
-							ed.on( \'init\', function( args ) {
-								jQuery( \'#\' + ed.id + \'_parent\' ).bind( \'mousemove\', function ( evt ) {
-																		cp_editor_mouse_move( ed, evt );
-																	} );
-							} );
-							ed.on( \'keydown\', function( args ) {
-								cp_editor_key_down( ed, \'' . $page . '\', \'' . $tab . '\' );
-							} );
-						}';
-				}
-			}
-
-			return $initArray;
-		}
-
-		// CoursePress CSS styles for TinyMCE
-		function mce_editor_style( $url ) {
-
-			// Only on these pages
-			$detect_pages = array(
-				'coursepress_page_course_details',
-				'coursepress-pro_page_course_details',
-			);
-
-			$page	 = get_current_screen()->id;
-			$tab	 = empty( $_GET[ 'tab' ] ) ? '' : $_GET[ 'tab' ];
-
-			if ( in_array( $page, $detect_pages ) ) {
-
-				if ( !empty( $url ) )
-					$url .= ',';
-
-				$url .= $this->plugin_url . 'css/editor_style_fix.css';
-			}
-
-			return $url;
-		}
-
 		function refresh_course_calendar() {
 			$ajax_response	 = array();
 			$ajax_status	 = 1; //success
@@ -3918,7 +3825,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				'message_password_minimum_length'	 => sprintf( __( 'Password must be at least %d characters in length.', 'cp' ), apply_filters( 'cp_min_password_length', 6 ) ),
 				'minimum_password_lenght'			 => apply_filters( 'cp_min_password_length', 6 ),
 				'message_login_error'				 => __( 'Username and/or password is not valid.', 'cp' ),
-				'message_passcode_invalid'				 => __( 'Passcode is not valid.', 'cp' ),
+				'message_passcode_invalid'			 => __( 'Passcode is not valid.', 'cp' ),
 			) );
 			//admin_url( 'admin-ajax.php' )
 
@@ -3967,26 +3874,26 @@ if ( !class_exists( 'CoursePress' ) ) {
 			if ( ( isset( $_GET[ 'saved' ] ) && $_GET[ 'saved' ] == 'ok' ) ) {
 				?>
 				<div class ="save_elements_message_ok">
-					<?php _e( 'The data has been saved successfully.', 'cp' ); ?>
+				<?php _e( 'The data has been saved successfully.', 'cp' ); ?>
 				</div>
-				<?php
-			}
-			if ( ( isset( $_GET[ 'saved' ] ) && $_GET[ 'saved' ] == 'progress_ok' ) ) {
-				?>
+					<?php
+				}
+				if ( ( isset( $_GET[ 'saved' ] ) && $_GET[ 'saved' ] == 'progress_ok' ) ) {
+					?>
 				<div class ="save_elements_message_ok">
-					<?php _e( 'Your progress has been saved successfully.', 'cp' ); ?>
+				<?php _e( 'Your progress has been saved successfully.', 'cp' ); ?>
 				</div>
-				<?php
+					<?php
+				}
+				$this->load_popup_window();
 			}
-			$this->load_popup_window();
-		}
 
-		/* custom header actions */
+			/* custom header actions */
 
-		function head_actions() {
-			$generate_cp_generator_meta = apply_filters( 'generate_cp_generator_meta', true );
-			if ( $generate_cp_generator_meta ) {
-				?>
+			function head_actions() {
+				$generate_cp_generator_meta = apply_filters( 'generate_cp_generator_meta', true );
+				if ( $generate_cp_generator_meta ) {
+					?>
 				<meta name ="generator" content ="<?php echo $this->name . ' ' . $this->version; ?>" />
 				<?php
 			}
@@ -4017,13 +3924,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 		}
 
 		function admin_header_actions() {
-			global $wp_version;
-
-			/* Adding menu icon font */
-			if ( $wp_version >= 3.8 ) {
-				wp_register_style( 'cp-38', $this->plugin_url . 'css/admin-icon.css' );
-				wp_enqueue_style( 'cp-38' );
-			}
 
 			if ( is_admin() ) {
 				if ( ( isset( $_GET[ 'cp_admin_ref' ] ) && $_GET[ 'cp_admin_ref' ] == 'cp_course_creation_page' ) || ( isset( $_POST[ 'cp_admin_ref' ] ) && $_POST[ 'cp_admin_ref' ] == 'cp_course_creation_page' ) ) {
@@ -4073,11 +3973,9 @@ if ( !class_exists( 'CoursePress' ) ) {
 
 			if ( $page == 'courses' || $page == 'course_details' || $page == 'instructors' || $page == 'students' || $page == 'assessment' || $page == 'reports' || $page == 'settings' || ( isset( $_GET[ 'taxonomy' ] ) && $_GET[ 'taxonomy' ] == 'course_category' ) ) {
 
-				add_filter( 'tiny_mce_before_init', array( &$this, 'cp_format_TinyMCE' ) );
-
 				wp_enqueue_script( 'courses_bulk', $this->plugin_url . 'js/coursepress-admin.js' );
 				wp_enqueue_script( 'wplink' );
-				wp_enqueue_style( 'editor-buttons' );
+
 				wp_localize_script( 'courses_bulk', 'coursepress', array(
 					'delete_instructor_alert'				 => __( 'Please confirm that you want to remove the instructor from this course?', 'cp' ),
 					'delete_pending_instructor_alert'		 => __( 'Please confirm that you want to cancel the invite. Instuctor will receive a warning when trying to activate.', 'cp' ),
@@ -4571,23 +4469,23 @@ if ( !class_exists( 'CoursePress' ) ) {
 				?>
 				<div class ="menu">
 					<ul class ='nav-menu'>
-						<?php
-						foreach ( $main_sorted_menu_items as $menu_item ) {
-							?>
+				<?php
+				foreach ( $main_sorted_menu_items as $menu_item ) {
+					?>
 							<li class ='menu-item-<?php echo $menu_item->ID; ?>'><a id ="<?php echo $menu_item->ID; ?>" href ="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a>
-								<?php if ( $menu_item->db_id !== '' ) { ?>
+							<?php if ( $menu_item->db_id !== '' ) { ?>
 									<ul class ="sub-menu dropdown-menu">
-										<?php
-										foreach ( $sub_sorted_menu_items as $menu_item ) {
-											?>
+									<?php
+									foreach ( $sub_sorted_menu_items as $menu_item ) {
+										?>
 											<li class ='menu-item-<?php echo $menu_item->ID; ?>'><a id ="<?php echo $menu_item->ID; ?>" href ="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a></li>
 										<?php } ?>
 									</ul>
-								<?php } ?>
+									<?php } ?>
 							</li>
-							<?php
-						}
-						?>
+								<?php
+							}
+							?>
 					</ul>
 				</div>
 
@@ -4671,16 +4569,16 @@ if ( !class_exists( 'CoursePress' ) ) {
 				?>
 				<div class ="menu">
 					<ul id ="mobile_menu" class ='mobile_menu'>
-						<?php
-						foreach ( $main_sorted_menu_items as $menu_item ) {
-							?>
+				<?php
+				foreach ( $main_sorted_menu_items as $menu_item ) {
+					?>
 							<li class ='menu-item-<?php echo $menu_item->ID; ?>'><a id ="<?php echo $menu_item->ID; ?>" href ="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a></li>
-								<?php if ( $menu_item->db_id !== '' ) { ?>
+							<?php if ( $menu_item->db_id !== '' ) { ?>
 									<?php
 									foreach ( $sub_sorted_menu_items as $menu_item ) {
 										?>
 									<li><a href ="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a></li>
-								<?php } ?>
+									<?php } ?>
 							<?php } ?>
 						<?php } ?>
 					</ul>

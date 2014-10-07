@@ -80,6 +80,11 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.1.2 =
+* Fixed issue with enrollment date and time (it uses now current_time( 'timestamp') instead of time())
+* Fixed issue with media shortcode display in the CoursePress theme
+* Fixed issue with course archive for courses without media set
+
 = 1.2.1.1 =
 * Added additional settings for controlling wp-login redirection
 * Fixed issue with "Instructor Capabilities" settings access as a student
