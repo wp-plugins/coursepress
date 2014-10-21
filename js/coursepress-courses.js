@@ -620,6 +620,7 @@ function step_1_update(attr) {
         _thumbnail_id: _thumbnail_id,
         meta_course_category: $('[name=meta_course_category]').val(),
         meta_course_language: $('[name=meta_course_language]').val(),
+        course_category: $('[name=course_category]').val(),
         // Don't remove
         meta_course_setup_progress: initialVars['meta_course_setup_progress'],
         meta_course_setup_marker: 'step-2',
@@ -1315,9 +1316,9 @@ jQuery(document).ready(function($) {
         ).done(function(data, status) {
             // Handle return
             if (status == 'success') {
-				console.log( data );
+				// console.log( data );
                 var response = $.parseJSON($(data).find('response_data').text());
-				console.log( response )
+				// console.log( response )
                 var response_type = $($.parseHTML(response.content));
 
                 if ($(response_type).hasClass('status-success')) {
@@ -1330,7 +1331,7 @@ jQuery(document).ready(function($) {
                     var content = '<div class="instructor-avatar-holder pending" id="' + response.data.code + '">' +
                             '<div class="instructor-status">PENDING</div>' +
                             remove_button +
-                            '<img class="avatar avatar-80 photo" width="80" height="80" src="http://www.gravatar.com/avatar/' + CryptoJS.MD5(response.data.email) + '" alt="admin">' +
+                            '<img class="avatar avatar-80 photo" width="80" height="80" src="//www.gravatar.com/avatar/' + CryptoJS.MD5(response.data.email) + '" alt="admin">' +
                             '<span class="instructor-name">' + response.data.first_name + ' ' + response.data.last_name + '</span>' +
                             '</div>';
 
@@ -1806,7 +1807,7 @@ jQuery(document).ready(function($) {
                         if (status == 'success') {
 
                             var response = $.parseJSON($(data).find('response_data').text());
-                            console.log(response);
+                            // console.log(response);
                             // Apply a new nonce when returning
                             if (response && response.toggle) {
                                 $('#course_state_id').attr('data-nonce', response.nonce);

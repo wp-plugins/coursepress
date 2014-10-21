@@ -38,7 +38,7 @@ if ( !class_exists( 'CP_Certificate_Templates' ) ) {
 
 			// create new PDF document
 
-			$pdf = new TCPDF( $metas[ 'document_template_orientation' ], PDF_UNIT, apply_filters( 'cp_additional_template_document_size_output', $metas[ 'document_template_size' ] ), true, apply_filters( 'cp_template_document_encoding', bloginfo( 'charset' ) ), false );
+			$pdf = new TCPDF( $metas[ 'document_template_orientation' ], PDF_UNIT, apply_filters( 'coursepress_additional_template_document_size_output', $metas[ 'document_template_size' ] ), true, apply_filters( 'coursepress_template_document_encoding', bloginfo( 'charset' ) ), false );
 
 			$pdf->setPrintHeader( false );
 			$pdf->setPrintFooter( false );
@@ -76,7 +76,7 @@ if ( !class_exists( 'CP_Certificate_Templates' ) ) {
 
 			$rows = '<table>';
 
-			for ( $i = 1; $i <= apply_filters( 'cp_template_template_row_number', 10 ); $i++ ) {
+			for ( $i = 1; $i <= apply_filters( 'coursepress_template_template_row_number', 10 ); $i++ ) {
 
 				$rows .= '<tr>';
 				$rows_elements = get_post_meta( $post_id, 'rows_' . $i, true );
@@ -136,7 +136,7 @@ if ( !class_exists( 'CP_Certificate_Templates' ) ) {
 					'post_type'		 => 'certificates',
 				);
 
-				$post = apply_filters( 'cp_certificate_template_post', $post );
+				$post = apply_filters( 'coursepress_certificate_template_post', $post );
 
 				if ( isset( $_POST[ 'template_id' ] ) ) {
 					$post[ 'ID' ] = $_POST[ 'template_id' ]; //If ID is set, wp_insert_post will do the UPDATE instead of insert
@@ -149,7 +149,7 @@ if ( !class_exists( 'CP_Certificate_Templates' ) ) {
 					foreach ( $_POST as $key => $value ) {
 						if ( preg_match( "/_post_meta/i", $key ) ) {//every field name with sufix "_post_meta" will be saved as post meta automatically
 							update_post_meta( $post_id, str_replace( '_post_meta', '', $key ), $value );
-							do_action( 'cp_template_post_metas' );
+							do_action( 'coursepress_template_post_metas' );
 						}
 					}
 				}
@@ -179,7 +179,7 @@ if ( !class_exists( 'CP_Certificate_Templates' ) ) {
 				),
 			);
 
-			return apply_filters( 'cp_template_col_fields', $default_fields );
+			return apply_filters( 'coursepress_template_col_fields', $default_fields );
 		}
 
 		function get_columns() {

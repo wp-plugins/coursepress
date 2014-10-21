@@ -56,7 +56,7 @@ function cp_filter_content( $content, $none_allowed = false ) {
 
 function cp_allowed_post_tags() {
 	$allowed_tags = wp_kses_allowed_html( 'post' );
-	return apply_filters( 'cp_allowes_post_tags', $allowed_tags );
+	return apply_filters( 'coursepress_allowed_post_tags', $allowed_tags );
 }
 
 function cp_set_last_visited_unit_page( $unit_id = false, $page_num = false, $student_id = false ) {
@@ -1149,23 +1149,23 @@ if ( !function_exists( 'cp_get_userdatabynicename' ) ) :
 
 		if ( empty( $user_nicename ) )
 			return false;
-		
-		$args = array (
-			'search'         => $user_nicename,
+
+		$args = array(
+			'search'		 => $user_nicename,
 			'search_columns' => array( 'user_nicename' ),
-			'number'         => '1',
-			'fields'         => array( 'id' ),
+			'number'		 => '1',
+			'fields'		 => array( 'id' ),
 		);
-		
-		$users = new WP_User_Query( $args );
+
+		$users	 = new WP_User_Query( $args );
 		$user_id = !empty( $users->results ) ? array_pop( $users->results ) : false;
-		
-		$user = ! empty( $user_id ) ? new WP_User( $user_id->id ) : false;
-		
+
+		$user = !empty( $user_id ) ? new WP_User( $user_id->id ) : false;
+
 		if ( empty( $user ) ) {
 			return false;
 		}
-		
+
 		$metavalues = get_user_meta( $user->ID );
 
 		if ( $metavalues ) {
@@ -1244,8 +1244,8 @@ if ( !function_exists( 'cp_register_module' ) ) {
 		}
 
 		if ( class_exists( $class_name ) ) {
-			$class													 = new $class_name();
-			$coursepress_modules_labels[ $module_name ]				 = $class->label;
+			$class														 = new $class_name();
+			$coursepress_modules_labels[ $module_name ]					 = $class->label;
 			$coursepress_modules_descriptions[ $module_name ]			 = $class->description;
 			$coursepress_modules[ $section ][ $module_name ]			 = $class_name;
 			$coursepress_modules_ordered[ $section ][ $class->order ]	 = $class_name;
@@ -1267,8 +1267,8 @@ if ( !function_exists( 'cp_register_front_page_module' ) ) {
 		}
 
 		if ( class_exists( $class_name ) ) {
-			$class															 = new $class_name();
-			$coursepress_front_page_modules_labels[ $module_name ]			 = $class->label;
+			$class																 = new $class_name();
+			$coursepress_front_page_modules_labels[ $module_name ]				 = $class->label;
 			$coursepress_front_page_modules_descriptions[ $module_name ]		 = $class->description;
 			$coursepress_front_page_modules[ $section ][ $module_name ]			 = $class_name;
 			$coursepress_front_page_modules_ordered[ $section ][ $class->order ] = $class_name;
@@ -1355,11 +1355,19 @@ function cp_in_array_r( $needle, $haystack, $strict = false ) {
 }
 
 function cp_suppress_errors() {
+	if ( CoursePress_Capabilities::is_campus() ) {
+		return;
+	}
+
 	ini_set( 'display_errors', 0 );
 	ini_set( 'scream.enabled', false );
 }
 
 function cp_show_errors() {
+	if ( CoursePress_Capabilities::is_campus() ) {
+		return;
+	}
+
 	ini_set( 'display_errors', 1 );
 	ini_set( 'scream.enabled', true );
 }
@@ -1559,9 +1567,9 @@ function cp_do_attachment_caption( $data ) {
 		}
 
 		// Width - used for caption shortcode
-		$attachment			 = get_post( $media_data[ 'id' ] );
-		$meta				 = wp_get_attachment_metadata( $media_data[ 'id' ] );
-		$media_data[ 'width' ] = $meta[ 'width' ];
+		$attachment				 = get_post( $media_data[ 'id' ] );
+		$meta					 = wp_get_attachment_metadata( $media_data[ 'id' ] );
+		$media_data[ 'width' ]	 = $meta[ 'width' ];
 
 		if ( 'media' == $caption_source ) {
 			$media_data[ 'caption' ] = $attachment->post_excerpt;
@@ -1677,7 +1685,7 @@ function cp_minify_output( $buffer ) {
 }
 
 function cp_get_file_size( $url, $human = true ) {
-
+	$bytes = 0;
 	// If its not a path... its probably a URL
 	if ( !preg_match( '/^\//', $url ) ) {
 		$header = wp_remote_get( $url );
@@ -1687,9 +1695,18 @@ function cp_get_file_size( $url, $human = true ) {
 			$bytes = 0;
 		}
 	} else {
-		$bytes	 = filesize( $url );
-		$bytes	 = !empty( $bytes ) ? $bytes : 0;
+		try {
+			$bytes	 = filesize( $url );
+			$bytes	 = !empty( $bytes ) ? $bytes : 0;
+		} catch ( Exception $e ) {
+			$bytes = 0;
+		}
 	}
+	
+	if($bytes = 0){
+		$human = false;
+	}
+	
 	return $human ? cp_format_file_size( $bytes ) : $bytes;
 }
 
@@ -1711,19 +1728,24 @@ function cp_format_file_size( $bytes ) {
 	return $bytes;
 }
 
+/**
+ * flush_rewrite_rules() wrapper for CoursePress.
+ *
+ * Used to wrap flush_rewrite_rules() so that rewrite flushes can
+ * be prevented in given environments.
+ *
+ * E.g. If we've got CampusPress/Edublogs then this method will have
+ * an early exit.
+ *
+ * @since 1.2.1
+ */
 function cp_flush_rewrite_rules() {
-	
-	// Don't allow flush_rewrite_rules when these functions exist and return true.	
-	$restricted = array( 'is_campus', 'is_edublogs' );
-	$prevent = false;
-	
-	foreach( $restricted as $restriction ) {
-		$prevent |= function_exists( $restriction ) && call_user_func( $restriction );
+
+	if ( CoursePress_Capabilities::is_campus() ) {
+		return;
 	}
-	
-	if( ! $prevent ) {
-		flush_rewrite_rules();				
-	}
+
+	flush_rewrite_rules();
 }
 
 function cp_search_array( $array, $key, $value ) {
@@ -1738,4 +1760,16 @@ function cp_search_array( $array, $key, $value ) {
 	}
 
 	return $results;
+}
+
+// fix for recursive serialized objects
+function cp_deep_unserialize( $serialized_object ) {
+
+	$new_array = maybe_unserialize( $serialized_object );
+
+	if ( is_serialized( $new_array ) ) {
+		$new_array = cp_deep_unserialize( $new_array );
+	}
+
+	return $new_array;
 }

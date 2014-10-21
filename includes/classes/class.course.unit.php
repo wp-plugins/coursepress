@@ -26,8 +26,8 @@ if ( !class_exists( 'Unit' ) ) {
 				
 				// Initialize the unit				
 				$this->init_unit( $this->details );
-				
-				// Cache the unit object				
+
+				// Cache the unit object	
 				self::cache( self::TYPE_UNIT, $this->id, $this->details );
 				// cp_write_log( 'Unit[' . $this->id . ']: Saved to cache..');
 			} else {
@@ -241,9 +241,9 @@ if ( !class_exists( 'Unit' ) ) {
 				$seconds = $total_seconds % 60;
 
 				if ( $minutes >= 1 || $seconds >= 1 ) {
-					return apply_filters( 'cp_unit_time_estimation_minutes_and_seconds_format', ($minutes . ':' . ($seconds <= 9 ? '0' . $seconds : $seconds) . ' min' ) );
+					return apply_filters( 'coursepress_unit_time_estimation_minutes_and_seconds_format', ($minutes . ':' . ($seconds <= 9 ? '0' . $seconds : $seconds) . ' min' ) );
 				} else {
-					return apply_filters( 'cp_unit_time_estimation_na_format', __( 'N/A', 'cp' ) );
+					return apply_filters( 'coursepress_unit_time_estimation_na_format', __( 'N/A', 'cp' ) );
 				}
 			}
 		}
@@ -273,9 +273,9 @@ if ( !class_exists( 'Unit' ) ) {
 			$seconds = $total_seconds % 60;
 
 			if ( $minutes >= 1 || $seconds >= 1 ) {
-				return apply_filters( 'cp_unit_time_estimation_minutes_and_seconds_format', ($minutes . ':' . ($seconds <= 9 ? '0' . $seconds : $seconds) . ' min' ) );
+				return apply_filters( 'coursepress_unit_time_estimation_minutes_and_seconds_format', ($minutes . ':' . ($seconds <= 9 ? '0' . $seconds : $seconds) . ' min' ) );
 			} else {
-				return apply_filters( 'cp_unit_time_estimation_na_format', __( 'N/A', 'cp' ) );
+				return apply_filters( 'coursepress_unit_time_estimation_na_format', __( 'N/A', 'cp' ) );
 			}
 		}
 
@@ -572,13 +572,14 @@ if ( !class_exists( 'Unit' ) ) {
 
 
 			/*
-			 * Duplicate course post meta
+			 * Duplicate unit post meta
 			 */
 
 			if( ! empty( $new_unit_id ) ) {
 				$post_metas = get_post_meta( $old_unit_id );
 				foreach ( $post_metas as $key => $meta_value ) {
 					$value = array_pop( $meta_value );
+					$value = maybe_unserialize( $value );
 					update_post_meta( $new_unit_id, $key, $value );
 				}
 			}	

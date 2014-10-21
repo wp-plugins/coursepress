@@ -145,8 +145,21 @@ if ( isset($_GET['notification_id']) ) {
                                 <br/><br/>
                                 <label for='course_name'><?php _e('Notification Content', 'cp'); ?></label>
                                 <?php
-                                $args = array( "textarea_name" => "notification_description", "editor_class" => 'cp-editor', "textarea_rows" => 10 );
-                                wp_editor(htmlspecialchars_decode(isset($notification->details->post_content) ? $notification->details->post_content : '' ), "notification_description", $args);
+								
+								$editor_name = "notification_description";
+								$editor_id = "notification_description";
+								$editor_content = htmlspecialchars_decode(isset($notification->details->post_content) ? $notification->details->post_content : '' );
+								
+                                $args = array(
+									"textarea_name" => $editor_name,
+									"editor_class" => 'cp-editor',
+									"textarea_rows" => 10,
+								);
+								
+								// Filter $args before showing editor
+								$args = apply_filters('coursepress_element_editor_args', $args, $editor_name, $editor_id);
+								
+                                wp_editor( $editor_content, $editor_id, $args);
                                 ?>
                                 <br/>
 

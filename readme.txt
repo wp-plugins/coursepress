@@ -80,6 +80,38 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.1.9=
+* Added new settings (Privacy) for controlling visibility of instructor username in the URL
+* Resolved issues with cp_get_file_size functions and fatal error if filesize cannot be retrieved
+
+= 1.2.1.8 =
+* Fixed issue course excerpt (not showing on course single and archive pages)
+* Fixed issue with popup windows (responsive)
+
+= 1.2.1.7 =
+* Resolved issue with plugin update
+
+= 1.2.1.6 =
+* Fixed bug where visual editor prevented unit elements from saving.
+* Fixed bug after duplicating course. Can now edit the course again.
+
+= 1.2.1.5 =
+* Fixed issue with instructor's profile avatar shortcode
+* Fixed conflicts with bbPress (not showing topics when CoursePress is active)
+* Resolved issue with course front-end edit links (caused by empty spaces)
+
+= 1.2.1.4 =
+* Fixed issue with incorrect registration of module post type
+* Fixed issues with hard coded http:\\ resources (google fonts and images in the theme and plugin)
+* Fixed issue with not saving Login Slug
+* Added additional options in settings for pages (instead of virtual pages) for enrollment process, login page, signup page, student dashboard and student settings
+* Visual editor improvements.  
+* Small code improvements
+
+= 1.2.1.3 =
+* Fixed issue with MarketPress product page infinite loop when CoursePress is active
+* Fixed issue with instructor avatars preview
+
 = 1.2.1.2 =
 * Fixed issue with enrollment date and time (it uses now current_time( 'timestamp') instead of time())
 * Fixed issue with media shortcode display in the CoursePress theme
