@@ -75,6 +75,8 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 4. Will your course have a six figure launch?
 5. Offer certification with your courses with grading, marking and assessment tools
 6. Display and promote your courses however you like
+7. Massively customizable
+8. Over a 13 payment gateways
 
 == Changelog ==
 
