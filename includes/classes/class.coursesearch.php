@@ -7,7 +7,7 @@ if ( !class_exists('Course_Search') ) {
 
     class Course_Search {
 
-        var $courses_per_page = 2;
+        var $courses_per_page = 10;
         var $args = array();
         var $is_light = true;
         var $post_type = 'course';

@@ -6,6 +6,32 @@ CHANGE LOG
 
 == Changelog ==
 
+= 1.2.2.3=
+* Changed the method of activation and installation of MarketPress
+* Resolved issue with incorrect SKU being returned in checkout process.
+
+= 1.2.2.2=
+* Fixed issue with not showing HTML tags in excerpt
+* Resolved issues with UTF-8 characters in filename in the TCPDF library
+* Fixed up issue with translation files not working properly.
+  - Updated languages files.
+  - Updated cp-en_GB translation (Enrollment vs Enrolment).
+  - Placing translations in /coursepress/languages now works correctly.
+* Added additional hooks for developers in class.course.unit.php and class.course.unit.module.php.
+* Fixed issue with some shortcodes displaying content out of place on a page.
+
+= 1.2.2.1=
+* Fixed issues caused e-newsletter plugin to show blank page in admin
+* Fixed possible issues with MarketPress update
+* Fixed issues with clearing cookie data in course checkout message
+* Updated translation files
+
+= 1.2.2.0=
+* Added new option in settings for PDF report font & Added new fonts
+* Updated MarketPress to 2.9.5.4
+* More consistent filters and actions for developers (more to come).
+* Improved database performance with new instructor 'Privacy' setting (may need to re-add instructors to old courses if you use the privacy option).
+
 = 1.2.1.9=
 * Added new settings (Privacy) for controlling visibility of instructor username in the URL
 * Resolved issues with cp_get_file_size functions and fatal error if filesize cannot be retrieved
