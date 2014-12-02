@@ -30,6 +30,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			add_shortcode( 'course_units', array( &$this, 'course_units' ) );
 			add_shortcode( 'course_units_loop', array( &$this, 'course_units_loop' ) );
 			add_shortcode( 'course_notifications_loop', array( &$this, 'course_notifications_loop' ) );
+			add_shortcode( 'courses_loop', array( &$this, 'courses_loop' ) );
 			add_shortcode( 'course_discussion_loop', array( &$this, 'course_discussion_loop' ) );
 			add_shortcode( 'course_unit_single', array( &$this, 'course_unit_single' ) );
 			add_shortcode( 'course_unit_details', array( &$this, 'course_unit_details' ) );
@@ -648,7 +649,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 				$is_enrolled	 = $student->has_access_to_course( $course_id );
 				$enrollment_date = '';
 				if ( $is_enrolled ) {
-					$enrollment_date = get_user_meta( get_current_user_id(), 'enrolled_course_date_' . $course_id, true );
+					$enrollment_date = get_user_option( 'enrolled_course_date_' . $course_id );
 					$enrollment_date = date( $date_format, strtotime( $enrollment_date ) );
 					$label			 = $label_enrolled;
 				}
@@ -1198,7 +1199,6 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 						$button_url = get_permalink( $course_id );
 						$button .= '<button data-link="' . esc_url( $button_url ) . '" class="apply-button-enrolled ' . $class . '">' . $details_text . '</button>';
 					}
-					
 				}
 
 				// User is logged in, if its a student, lets see if they can access their course.
@@ -1891,8 +1891,8 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			$show_divider		 = sanitize_html_class( $show_divider );
 			$show_title			 = sanitize_html_class( $show_title );
 			$show_media			 = sanitize_html_class( $show_media );
-			$media_type			 = sanitize_text_field( $media_type );
-			$media_priority		 = sanitize_text_field( $media_priority );
+			$media_type			 = !empty( $media_type ) ? sanitize_text_field( $media_type ) : 'image';
+			$media_priority		 = !empty( $media_priority ) ? sanitize_text_field( $media_priority ) : 'image';
 			$admin_links		 = (bool) $admin_links;
 			$manage_link_title	 = sanitize_text_field( $manage_link_title );
 			$finished_link_title = sanitize_text_field( $finished_link_title );
@@ -2238,7 +2238,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 					foreach ( $instructors as $instructor ) {
 
 						$profile_href = trailingslashit( site_url() ) . trailingslashit( $instructor_profile_slug );
-						$profile_href .= get_option( 'show_instructor_username', 1 ) == 1 ? trailingslashit( $instructor->user_login ) : md5(trailingslashit( $instructor->user_login ));
+						$profile_href .= get_option( 'show_instructor_username', 1 ) == 1 ? trailingslashit( $instructor->user_login ) : trailingslashit( md5( $instructor->user_login ) );
 
 						switch ( $style ) {
 
@@ -2360,10 +2360,10 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			$instructor = get_userdata( $instructor_id );
 
 			if ( $instructor_id ) {
-				if(( get_option( 'show_instructor_username', 1 ) == 1 )){
+				if ( ( get_option( 'show_instructor_username', 1 ) == 1 ) ) {
 					$username = trailingslashit( $instructor->user_login );
-				}else{
-					$username = trailingslashit(md5($instructor->user_login));
+				} else {
+					$username = trailingslashit( md5( $instructor->user_login ) );
 				}
 				return trailingslashit( site_url() ) . trailingslashit( $instructor_profile_slug ) . $username;
 			}
@@ -2712,9 +2712,13 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 				}
 			}
 
+			//echo $unit_id;
+
 			$args = array(
-				'post_type'	 => 'unit',
-				'p'			 => $unit_id
+				'post_type'		 => 'unit',
+				//'post_id'		 => $unit_id,
+				'post__in' => array($unit_id),
+				'post_status'	 => cp_can_see_unit_draft() ? 'any' : 'publish',
 			);
 
 			ob_start();
@@ -2756,6 +2760,46 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			);
 
 			query_posts( $args );
+		}
+
+		function courses_loop( $atts ) {
+			global $wp;
+			if ( array_key_exists( 'course_category', $wp->query_vars ) ) {
+				$page		 = ( isset( $wp->query_vars[ 'paged' ] ) ) ? $wp->query_vars[ 'paged' ] : 1;
+				$query_args	 = array(
+					'post_type'		 => 'course',
+					'post_status'	 => 'publish',
+					'paged'			 => $page,
+					'tax_query'		 => array(
+						array(
+							'taxonomy'	 => 'course_category',
+							'field'		 => 'slug',
+							'terms'		 => array( $wp->query_vars[ 'course_category' ] ),
+						)
+					)
+				);
+
+				$selected_course_order_by_type	 = get_option( 'course_order_by_type', 'DESC' );
+				$selected_course_order_by		 = get_option( 'course_order_by', 'post_date' );
+
+				if ( $selected_course_order_by == 'course_order' ) {
+					$query_args[ 'meta_key' ]	 = 'course_order';
+					$query_args[ 'meta_query' ]	 = array(
+						'relation' => 'OR',
+						array(
+							'key'		 => 'course_order',
+							'compare'	 => 'NOT EXISTS'
+						),
+					);
+					$query_args[ 'orderby' ]	 = 'meta_value';
+					$query_args[ 'order' ]		 = $selected_course_order_by_type;
+				} else {
+					$query_args[ 'orderby' ] = $selected_course_order_by;
+					$query_args[ 'order' ]	 = $selected_course_order_by_type;
+				}
+
+				query_posts( $query_args );
+			}
 		}
 
 		function course_notifications_loop( $atts ) {
@@ -2849,12 +2893,15 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			$course	 = new Course( $course_id );
 			$units	 = $course->get_units( $course_id, 'publish' );
 
-			$student = new Student( get_current_user_id() );
+			$user_id = get_current_user_id();
+			$student = new Student( $user_id );
 //redirect to the parent course page if not enrolled
 			if ( !current_user_can( 'manage_options' ) ) {//If current user is not admin, check if he can access to the units
 				if ( $course->details->post_author != get_current_user_id() ) {//check if user is an author of a course ( probably instructor )
 					if ( !current_user_can( 'coursepress_view_all_units_cap' ) ) {//check if the instructor, even if it's not the author of the course, maybe has a capability given by the admin
-						if ( !$student->has_access_to_course( $course_id ) ) {//if it's not an instructor who made the course, check if he is enrolled to course
+						//if it's not an instructor who made the course, check if he is enrolled to course
+						// Added 3rd parameter to deal with legacy meta data
+						if ( !$student->user_enrolled_in_course( $course_id, $user_id, 'update_meta' ) ) {
 // if( defined('DOING_AJAX') && DOING_AJAX ) { cp_write_log('doing ajax'); }
 //ob_start();
 							wp_redirect( get_permalink( $course_id ) ); //if not, redirect him to the course page so he may enroll it if the enrollment is available
@@ -3452,7 +3499,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 				$unit_id = 0;
 			}
 
-			$comments_args = array(
+			$comments_args	 = array(
 // change the title of send button
 				'label_submit'			 => 'Send',
 				// change the title of the reply secpertion
@@ -3464,7 +3511,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 			);
 			ob_start();
 			comment_form( $comments_args, $unit_id );
-			$content = ob_get_clean();
+			$content		 = ob_get_clean();
 			return $content;
 		}
 
@@ -3517,15 +3564,15 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 				case 'student_login':
 					require( $plugin_dir . 'includes/templates/student-login.php');
 					break;
-				
+
 				case 'student_signup':
 					require( $plugin_dir . 'includes/templates/student-signup.php');
 					break;
-				
+
 				case 'student_dashboard':
 					require( $plugin_dir . 'includes/templates/student-dashboard.php');
 					break;
-				
+
 				default:
 					_e( 'Page cannot be found', 'cp' );
 			}
@@ -3678,6 +3725,14 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 												$form_errors++;
 											}
 
+											if ( isset( $_POST[ 'tos_agree' ] ) ) {
+												if ( $_POST[ 'tos_agree' ] == '0' ) {
+													$form_message		 = __( 'You must agree to the Terms of Service in order to signup.', 'cp' );
+													$form_message_class	 = 'red';
+													$form_errors++;
+												}
+											}
+
 											if ( $form_errors == 0 ) {
 												if ( $student_id = $student->add_student( $student_data ) !== 0 ) {
 //$form_message = __( 'Account created successfully! You may now <a href="' . ( get_option( 'use_custom_login_form', 1 ) ? trailingslashit( site_url() . '/' . $this->get_login_slug() ) : wp_login_url() ) . '">log into your account</a>.', 'cp' );
@@ -3718,7 +3773,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 												}
 											}
 										} else {
-											$form_message		 = __( 'User with the same e-mail already exists.', 'cp' );
+											$form_message		 = __( 'Sorry, that email address is already used!', 'cp' );
 											$form_message_class	 = 'error';
 										}
 									} else {
@@ -3790,6 +3845,17 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 									<?php _e( 'Confirm Password', 'cp' ); ?>:
 									<input type="password" name="password_confirmation" value="" />
 								</label>
+								<br clear="both" /><br />
+
+								<?php
+								if ( shortcode_exists( 'signup-tos' ) ) {
+									if ( get_option( 'show_tos', 0 ) == '1' ) {
+										?>
+										<label class="full"><?php echo do_shortcode( '[signup-tos]' ); ?></label>
+										<?php
+									}
+								}
+								?>
 
 								<?php do_action( 'coursepress_after_all_signup_fields' ); ?>
 
@@ -4180,7 +4246,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 											}
 											?>
 									</td>
-								<?php }//general col visibility                   ?>
+								<?php }//general col visibility                     ?>
 							</tr>
 							<?php
 							$current_row++;

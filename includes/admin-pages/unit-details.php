@@ -59,13 +59,15 @@ if ( isset($_POST['action']) && $_POST['action'] == 'update_unit' ) {
             //ob_start();
             // if( defined('DOING_AJAX') && DOING_AJAX ) { cp_write_log('doing ajax'); }
 
-
+	        /**
+	         * @todo: Work out what needs to happen before the redirect so that we can properly exit the script.
+	         */
             if ( isset($_GET['ms']) ) {
                 wp_redirect(admin_url('admin.php?page=' . $page . '&tab=units&course_id=' . $course_id . '&action=edit&unit_id=' . $new_post_id . '&ms=' . $_GET['ms'] . '&active_element=' . $active_element . (isset($preview_redirect_url) && $preview_redirect_url !== '' ? '&preview_redirect_url=' . $preview_redirect_url : '' ) . '&unit_page_num=' . (isset($unit_page_num) ? $unit_page_num : 1) . '#unit-page-' . (isset($unit_page_num) ? $unit_page_num : 1)));
-                //exit;
+                //exit;  // exiting the script here breaks page elements
             } else {
                 wp_redirect(admin_url('admin.php?page=' . $page . '&tab=units&course_id=' . $course_id . '&action=edit&unit_id=' . $new_post_id));
-                //exit;
+                //exit; // exiting the script here breaks page elements
             }
         } else {
             //an error occured
@@ -522,9 +524,10 @@ $preview_redirect = isset($_REQUEST['preview_redirect']) ? $_REQUEST['preview_re
 
             var current_page = jQuery('#unit-pages .ui-tabs-nav .ui-state-active a').html();
             var elements_count = jQuery('#unit-page-1 .modules_accordion .module-holder-title').length;
+			var current_page_elements_count = jQuery('#unit-page-' + current_page + ' .modules_accordion .module-holder-title').length;
             //jQuery('#unit-page-' + current_unit_page + ' .elements-holder .no-elements').show();
 
-            if ((current_page == 1 && elements_count == 0) || (current_page >= 2 && elements_count == 1)) {
+            if ((current_page == 1 && elements_count == 0) || (current_page >= 2 && current_page_elements_count == 1)) {
                 jQuery('#unit-page-' + current_page + ' .elements-holder .no-elements').show();
             } else {
                 jQuery('#unit-page-' + current_page + ' .elements-holder .no-elements').hide();

@@ -9,7 +9,13 @@ if ( empty( $tab ) ) {
 	if ( current_user_can( 'manage_options' ) ) {
 		$tab = 'general';
 	} else {
-		die( __( 'You do not have required permissions to access Settings.', 'cp' ) );
+		?>
+<div id="error-page">
+	<p><?php _e( 'You do not have required permissions to access Settings.', 'cp' );?></p>
+</div>
+<?php
+exit;
+		//die( __( 'You do not have required permissions to access Settings.', 'cp' ) );
 	}
 }
 
@@ -47,6 +53,12 @@ if ( isset( $_POST[ '_wpnonce' ] ) && current_user_can( 'manage_options' ) ) {
 			update_option( 'show_instructor_username', 1 );
 		} else {
 			update_option( 'show_instructor_username', 0 );
+		}
+
+		if ( isset( $_POST[ 'option_show_tos' ] ) ) {
+			update_option( 'show_tos', 1 );
+		} else {
+			update_option( 'show_tos', 0 );
 		}
 
 		// Conditional flush_rewrite_rules
@@ -91,13 +103,15 @@ if ( isset( $_POST[ '_wpnonce' ] ) && current_user_can( 'manage_options' ) ) {
 		$menus[ 'shortcodes' ] = __( 'Shortcodes', 'cp' );
 	}
 
-	$menus[ 'cp-marketpress' ] = __( 'MarketPress', 'cp' );
+	if ( current_user_can( 'install_plugins' ) && current_user_can( 'activate_plugins' ) ) {
+		$menus[ 'cp-marketpress' ] = __( 'MarketPress', 'cp' );
+	}
 
 	$menus = apply_filters( 'coursepress_settings_new_menus', $menus );
 	?>
 
     <div id="undefined-sticky-wrapper" class="sticky-wrapper">
-		<div class="sticky-slider visible-small visible-extra-small"><i class="fa fa-chevron-circle-right"></i></div>
+        <div class="sticky-slider visible-small visible-extra-small"><i class="fa fa-chevron-circle-right"></i></div>
         <ul class="mp-tabs" style="">
 			<?php
 			foreach ( $menus as $key => $menu ) {
@@ -108,9 +122,9 @@ if ( isset( $_POST[ '_wpnonce' ] ) && current_user_can( 'manage_options' ) ) {
 				<?php
 			}
 			?>
-			<li class="mp-tab">
-				<a class="mp-tab-link" href="<?php echo admin_url( 'admin.php?page=courses&quick_setup' ); ?>"><?php _e( 'View Setup Guide', 'cp' ); ?></a>
-			</li>
+            <li class="mp-tab">
+                <a class="mp-tab-link" href="<?php echo admin_url( 'admin.php?page=courses&quick_setup' ); ?>"><?php _e( 'View Setup Guide', 'cp' ); ?></a>
+            </li>
         </ul>
     </div>
 
@@ -159,7 +173,7 @@ if ( isset( $_POST[ '_wpnonce' ] ) && current_user_can( 'manage_options' ) ) {
 
 			case 'cp-marketpress':
 				//if ( current_user_can( 'manage_options' ) ) {
-					$this->show_settings_marketpress();
+				$this->show_settings_marketpress();
 				//}
 				break;
 

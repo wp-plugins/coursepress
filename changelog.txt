@@ -6,6 +6,72 @@ CHANGE LOG
 
 == Changelog ==
 
+= 1.2.3.3 =
+* Fixed issue with thumbnails not displaying or getting generated for courses.
+
+= 1.2.3.2 =
+* Fixed translation file
+
+= 1.2.3.1 =
+* Updated MarketPress to 2.9.5.9
+* Added additional set of instructor capabilities for Discussions
+* CSS improvements (added better CSS styles on the feature course buttons in the CoursePress theme)
+* Updated translation file
+* Added support for WordPress "Week Starts On" day in the course date fields and the Unit Availability field
+* Fixed issue with saving course categories
+* Fixed issue with showing "No elements have been added to this page yet" on the last unit page
+* Fixed issue where users saving their own profiles remove instructor capabilities
+* Fixed issue with MarketPress sale price (not being saved)
+* Fixed issue with primary blog on multisite
+* Fixed issue with pagination class (not displaying more than 10 pages)
+* Fixed issue with not showing draft units preview (for both admin and assigned instructors)
+* Fixed issue with duplicate course and MarketPress products
+* Other code improvements
+
+= 1.2.2.9 =
+* Added course reordering on courses admin page (drag & drop)
+* Added new options under CoursePress general settings for controlling course order in admin and front 
+* Added option for displaying different number of rows on the courses admin page
+* New hooks for developers and code improvements
+* Fixed issues with loosing element content 
+
+= 1.2.2.8 =
+* Critical Fix: Fixed bug preventing elements being added to units.
+
+= 1.2.2.7 =
+* Resolving translation issues on general settings page and email body (functions)
+* Included new translation file containing all localization strings
+* Added course calendar locale for month and day of the week names
+* Fixed: Primary blog tweaks on multisite installs.
+* Fixed: Instructor capabilities on multisite installs.
+* Fixed: [course_list show_media="yes"] now correctly shows the media defined in settings.
+* Updated MarketPress (2.9.5.8)
+* Other small code improvements
+
+= 1.2.2.6 =
+* Fixed issue with wrong MD5 for instructor username in shortcodes which caused broken instructor single page if "Show Instructor Username in URL" option is not selected
+* Fixed issue with table prefix (instructor_by_hash)
+* Fixed issue with SKU not being shown on course overview page and product list in MarketPress
+* Fix broken redirect to cart on signup
+* Small code improvements
+
+= 1.2.2.5 =
+* Multisite improvements for students and instructors.
+* Added course categories and course categories widget (in order to make it work please re-save CoursePress settings)
+* Fixed: CoursePress theme navigation restored in responsive/mobile views.
+* Improved some responsive elements of the CoursePress theme.
+* Fixed issue with mobile menu not appearing on the some Android devices
+* Small code improvements
+* Updated MarketPress to 2.9.5.7
+
+= 1.2.2.4 =
+* Added integration with "Terms of Service" plugin http://premium.wpmudev.org/project/terms-of-service/
+* Improved CoursePress for multi-site.
+* Improved CoursePress security for multi-site.
+* Improved UX for MarketPress in the admin (MarketPress activation and installation menu, links and messages shown to users who don't have required permissions)
+* Future integration with Ultimate Facebook plugin to better promote courses on Facebook using OpenGraph data. (Currently works with CoursePress theme, but requires future Ultimate Facebook 2.7.8+ for all other themes.)
+* Fixed: Instructors can now successfully create own courses (provided capability is set in CoursePress settings).
+
 = 1.2.2.3=
 * Changed the method of activation and installation of MarketPress
 * Resolved issue with incorrect SKU being returned in checkout process.

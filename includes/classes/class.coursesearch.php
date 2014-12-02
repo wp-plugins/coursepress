@@ -12,25 +12,45 @@ if ( !class_exists('Course_Search') ) {
         var $is_light = true;
         var $post_type = 'course';
 
-        function __construct( $search_term = '', $page_num = '' ) {
+        function __construct( $search_term = '', $page_num = '', $courses_per_page = 10 ) {
 			$this->is_light = CoursePress_Capabilities::is_pro() ? false : true;
             if ( $this->is_light ) {
                 $page_num = 1;
                 $this->courses_per_page = 2;
-            }
+			}else{
+				if($this->courses_per_page !== $courses_per_page){
+					$this->courses_per_page = $courses_per_page;
+				}
+			}
             $this->search_term = $search_term;
             $this->raw_page = ( '' == $page_num ) ? false : ( int ) $page_num;
             $this->page_num = ( int ) ( '' == $page_num ) ? 1 : $page_num;
 
+			$selected_course_order_by_type	 = get_option( 'course_order_by_type', 'DESC' );
+			$selected_course_order_by		 = get_option( 'course_order_by', 'post_date' );
+			
             $args = array(
-                //'s' => $this->search_term,
                 'posts_per_page' => $this->courses_per_page,
                 'offset' => ( $this->page_num - 1 ) * $this->courses_per_page,
-                'orderby' => 'post_date',
-                'order' => 'DESC',
                 'post_type' => $this->post_type,
-                'post_status' => 'any'
+                'post_status' => 'any',
             );
+			
+			if($selected_course_order_by == 'course_order'){
+				$args['meta_key'] = 'course_order';
+				$args['meta_query'] = array(
+                    'relation' => 'OR',
+                    array(
+                        'key' => 'course_order',
+                        'compare' => 'NOT EXISTS'
+                    ),
+                );
+				$args['orderby'] = 'meta_value';
+				$args['order'] = $selected_course_order_by_type;
+			}else{
+				$args['orderby'] = $selected_course_order_by;
+				$args['order'] = $selected_course_order_by_type;
+			}
 
             $this->args = $args;
         }
@@ -73,7 +93,7 @@ if ( !class_exists('Course_Search') ) {
             return count(get_posts($args, OBJECT));
         }
 
-        function page_links() {
+        function page_links($show_courses_per_page = 10) {
             $pagination = new CoursePress_Pagination();
             $pagination->Items($this->get_count_of_all_courses());
             $pagination->limit($this->courses_per_page);
@@ -83,7 +103,7 @@ if ( !class_exists('Course_Search') ) {
             if ( $this->search_term != '' ) {
                 $pagination->target(esc_url("admin.php?page=courses&s=" . $this->search_term));
             } else {
-                $pagination->target("admin.php?page=courses");
+                $pagination->target("admin.php?page=courses&courses_per_page=".$show_courses_per_page);
             }
             $pagination->currentPage($this->page_num);
             $pagination->nextIcon('&#9658;');

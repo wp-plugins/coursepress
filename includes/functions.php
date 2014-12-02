@@ -13,6 +13,12 @@
   return $url;
   } */
 
+function cp_get_id_by_post_name( $post_name ) {
+	global $wpdb;
+	$id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name = '%s'", $post_name ) );
+	return $id;
+}
+
 function cp_can_see_unit_draft() {
 	if ( current_user_can( 'manage_options' ) || current_user_can( 'coursepress_create_course_unit_cap' ) ) {
 		return true;
@@ -66,7 +72,8 @@ function cp_set_last_visited_unit_page( $unit_id = false, $page_num = false, $st
 	if ( !$student_id ) {
 		$student_id = get_current_user_ID();
 	}
-	update_user_meta( $student_id, 'last_visited_unit_' . $unit_id . '_page', $page_num );
+	$global_option = !is_multisite();
+	update_user_option( $student_id, 'last_visited_unit_' . $unit_id . '_page', $page_num, $global_option );
 }
 
 function cp_set_visited_course( $unit_id, $student_id = false ) {
@@ -76,7 +83,7 @@ function cp_set_visited_course( $unit_id, $student_id = false ) {
 	}
 
 	$course_id		 = wp_get_post_parent_id( $unit_id );
-	$visited_courses = get_user_meta( $student_id, 'visited_course_units_' . $course_id, true );
+	$visited_courses = get_user_option( 'visited_course_units_' . $course_id, $student_id );
 
 	if ( $visited_courses === false ) {
 		$visited_courses = $course_id;
@@ -87,7 +94,8 @@ function cp_set_visited_course( $unit_id, $student_id = false ) {
 		}
 		$visited_courses = implode( ',', $visited_courses );
 	}
-	update_user_meta( $student_id, 'visited_course_units_' . $course_id, $visited_courses );
+	$global_option = !is_multisite();
+	update_user_option( $student_id, 'visited_course_units_' . $course_id, $visited_courses, $global_option );
 }
 
 function cp_is_course_visited( $course_id, $student_id = false ) {
@@ -95,7 +103,7 @@ function cp_is_course_visited( $course_id, $student_id = false ) {
 		$student_id = get_current_user_ID();
 	}
 
-	$visited_courses = get_user_meta( $student_id, 'visited_course_units_' . $course_id, true );
+	$visited_courses = get_user_option( 'visited_course_units_' . $course_id, $student_id );
 
 	if ( $visited_courses ) {
 		$visited_courses = (explode( ',', $visited_courses ));
@@ -126,9 +134,9 @@ function cp_set_visited_unit_page( $unit_id = false, $page_num = false, $student
 		$student_id = get_current_user_ID();
 	}
 
-
-//delete_user_meta($student_id, 'visited_unit_pages_' . $unit_id . '_page');
-	$visited_pages = get_user_meta( $student_id, 'visited_unit_pages_' . $unit_id . '_page', true );
+//$global_option = ! is_multisite();
+//delete_user_option($student_id, 'visited_unit_pages_' . $unit_id . '_page', $global_option);
+	$visited_pages = get_user_option( 'visited_unit_pages_' . $unit_id . '_page', $student_id );
 
 	if ( $visited_pages === false ) {
 		$visited_pages = $page_num;
@@ -140,7 +148,8 @@ function cp_set_visited_unit_page( $unit_id = false, $page_num = false, $student
 		$visited_pages = implode( ',', $visited_pages );
 	}
 
-	update_user_meta( $student_id, 'visited_unit_pages_' . $unit_id . '_page', $visited_pages );
+	$global_option = !is_multisite();
+	update_user_option( $student_id, 'visited_unit_pages_' . $unit_id . '_page', $visited_pages, $global_option );
 	cp_set_visited_course( $unit_id, $student_id );
 }
 
@@ -148,7 +157,7 @@ function cp_get_number_of_unit_pages_visited( $unit_id = false, $student_id = fa
 	if ( !$student_id ) {
 		$student_id = get_current_user_ID();
 	}
-	$visited_pages = get_user_meta( $student_id, 'visited_unit_pages_' . $unit_id . '_page', true );
+	$visited_pages = get_user_option( 'visited_unit_pages_' . $unit_id . '_page', $student_id );
 	if ( $visited_pages ) {
 		return count( explode( ',', $visited_pages ) ) - 1;
 	} else {
@@ -160,7 +169,7 @@ function cp_get_last_visited_unit_page( $unit_id, $student_id = false ) {
 	if ( !$student_id ) {
 		$student_id = get_current_user_ID();
 	}
-	$last_visited_unit_page = get_user_meta( $student_id, 'last_visited_unit_' . $unit_id . '_page', true );
+	$last_visited_unit_page = get_user_option( 'last_visited_unit_' . $unit_id . '_page', $student_id );
 	if ( $last_visited_unit_page ) {
 		return $last_visited_unit_page;
 	} else {
@@ -655,7 +664,7 @@ Check this page for more info on the course: %4$s
 If you have any question feel free to contact us.
 
 Yours sincerely,
-%5$s Team' ), 'STUDENT_FIRST_NAME', 'COURSE_NAME', 'COURSE_EXCERPT', '<a href="COURSE_ADDRESS">COURSE_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>', 'PASSCODE' );
+%5$s Team', 'cp' ), 'STUDENT_FIRST_NAME', 'COURSE_NAME', 'COURSE_EXCERPT', '<a href="COURSE_ADDRESS">COURSE_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>', 'PASSCODE' );
 
 	return get_option( 'invitation_content_passcode_email', $default_invitation_content_passcode_email );
 }
@@ -687,7 +696,7 @@ Check this page for more info on the course: %4$s
 If you have any question feel free to contact us.
 
 Yours sincerely,
-%5$s Team' ), 'STUDENT_FIRST_NAME', 'COURSE_NAME', 'COURSE_EXCERPT', '<a href="COURSE_ADDRESS">COURSE_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>' );
+%5$s Team', 'cp' ), 'STUDENT_FIRST_NAME', 'COURSE_NAME', 'COURSE_EXCERPT', '<a href="COURSE_ADDRESS">COURSE_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>' );
 	return get_option( 'invitation_content_email', $default_invitation_content_email );
 }
 
@@ -713,7 +722,7 @@ Congratulations! You have registered account with %2$s successfully! You may log
 Get started by exploring our courses here: %4$s
 
 Yours sincerely,
-%5$s Team' ), 'STUDENT_FIRST_NAME', 'BLOG_NAME', '<a href="LOGIN_ADDRESS">LOGIN_ADDRESS</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>' );
+%5$s Team', 'cp' ), 'STUDENT_FIRST_NAME', 'BLOG_NAME', '<a href="LOGIN_ADDRESS">LOGIN_ADDRESS</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', '<a href="WEBSITE_ADDRESS">WEBSITE_ADDRESS</a>' );
 
 	return get_option( 'registration_content_email', $default_registration_content_email );
 }
@@ -742,7 +751,7 @@ Please refer to your Order ID (ORDER_ID) whenever contacting us.
 You can track the latest status of your order here: ORDER_STATUS_URL
 
 Yours sincerely,
-%5$s Team' ), 'CUSTOMER_NAME', '<a href="COURSE_ADDRESS">COURSE_TITLE</a>', '<a href="STUDENT_DASHBOARD">' . __( 'Dashboard', 'cp' ) . '</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', 'BLOG_NAME' );
+%5$s Team', 'cp' ), 'CUSTOMER_NAME', '<a href="COURSE_ADDRESS">COURSE_TITLE</a>', '<a href="STUDENT_DASHBOARD">' . __( 'Dashboard', 'cp' ) . '</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', 'BLOG_NAME' );
 
 	return get_option( 'mp_order_content_email', $default_mp_order_content_email );
 }
@@ -771,7 +780,7 @@ You may check all courses you are enrolled in here: %3$s.
 Or you can explore other courses in your %4$s
 
 Yours sincerely,
-%5$s Team' ), 'STUDENT_FIRST_NAME', '<a href="COURSE_ADDRESS">COURSE_TITLE</a>', '<a href="STUDENT_DASHBOARD">' . __( 'Dashboard', 'cp' ) . '</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', 'BLOG_NAME' );
+%5$s Team', 'cp' ), 'STUDENT_FIRST_NAME', '<a href="COURSE_ADDRESS">COURSE_TITLE</a>', '<a href="STUDENT_DASHBOARD">' . __( 'Dashboard', 'cp' ) . '</a>', '<a href="COURSES_ADDRESS">COURSES_ADDRESS</a>', 'BLOG_NAME' );
 
 	return get_option( 'enrollment_content_email', $default_enrollment_content_email );
 }
@@ -820,12 +829,15 @@ function cp_admin_notice( $notice, $type = 'updated' ) {
 function cp_get_number_of_instructors() {
 
 	$args = array(
-		'blog_id'		 => $GLOBALS[ 'blog_id' ],
 		//'role' => 'instructor',
 		'count_total'	 => false,
 		'fields'		 => array( 'display_name', 'ID' ),
 		'who'			 => ''
 	);
+
+	if ( is_multisite() ) {
+		$args[ 'blog_id' ] = get_current_blog_id();
+	}
 
 	$instructors = get_users( $args );
 
@@ -833,14 +845,13 @@ function cp_get_number_of_instructors() {
 }
 
 function cp_instructors_avatars( $course_id, $remove_buttons = true, $just_count = false ) {
-	global $post_id;
+	global $post_id, $wpdb;
 
 	$content = '';
 
 	//coursepress_courses_cap
 
 	$args = array(
-		'blog_id'		 => $GLOBALS[ 'blog_id' ],
 		//'role' => 'instructor',
 		'meta_key'		 => 'course_' . $course_id,
 		'meta_value'	 => $course_id,
@@ -858,8 +869,12 @@ function cp_instructors_avatars( $course_id, $remove_buttons = true, $just_count
 		'who'			 => ''
 	);
 
-	$instructors = get_users( $args );
+	if ( is_multisite() ) {
+		$args[ 'blog_id' ]	 = get_current_blog_id();
+		$args[ 'meta_key' ]	 = $wpdb->prefix . 'course_' . $course_id;
+	}
 
+	$instructors = get_users( $args );
 
 	if ( $just_count == true ) {
 		return count( $instructors );
@@ -883,7 +898,6 @@ function cp_instructors_avatars_array( $args = array() ) {
     var instructor_avatars = new Array();';
 
 	$args = array(
-		'blog_id'		 => $GLOBALS[ 'blog_id' ],
 		//'role' => 'instructor',
 		'meta_key'		 => ( isset( $args[ 'meta_key' ] ) ? $args[ 'meta_key' ] : '' ),
 		'meta_value'	 => ( isset( $args[ 'meta_value' ] ) ? $args[ 'meta_value' ] : '' ),
@@ -900,6 +914,10 @@ function cp_instructors_avatars_array( $args = array() ) {
 		'fields'		 => array( 'display_name', 'ID' ),
 		'who'			 => ''
 	);
+
+	if ( is_multisite() ) {
+		$args[ 'blog_id' ] = get_current_blog_id();
+	}
 
 	$instructors = get_users( $args );
 
@@ -940,7 +958,6 @@ function cp_students_drop_down() {
 	$content .= '<select name="students" data-placeholder="' . __( 'Choose a Student...', 'cp' ) . '" class="chosen-select">';
 
 	$args = array(
-		'blog_id'		 => $GLOBALS[ 'blog_id' ],
 		'role'			 => '',
 		'meta_key'		 => '',
 		'meta_value'	 => '',
@@ -957,6 +974,10 @@ function cp_students_drop_down() {
 		'fields'		 => array( 'display_name', 'ID' ),
 		'who'			 => ''
 	);
+
+	if ( is_multisite() ) {
+		$args[ 'blog_id' ] = get_current_blog_id();
+	}
 
 	$students = get_users( $args );
 
@@ -979,7 +1000,6 @@ function cp_instructors_drop_down( $class = '' ) {
 	$content .= '<select name="instructors" id="instructors" data-placeholder="' . __( 'Choose a Course Instructor...', 'cp' ) . '" class="' . $class . '">';
 
 	$args = array(
-		'blog_id'		 => $GLOBALS[ 'blog_id' ],
 		//'role' => 'instructor',
 		'meta_key'		 => '',
 		'meta_value'	 => '',
@@ -997,6 +1017,10 @@ function cp_instructors_drop_down( $class = '' ) {
 		'fields'		 => array( 'display_name', 'ID' ),
 		'who'			 => ''
 	);
+
+	if ( is_multisite() ) {
+		$args[ 'blog_id' ] = get_current_blog_id();
+	}
 
 	$instructors = get_users( $args );
 
@@ -1020,7 +1044,11 @@ if ( !function_exists( 'cp_delete_user_meta_by_key' ) ) {
 		global $wpdb;
 
 		// if ( $wpdb->query($wpdb->prepare("DELETE FROM $wpdb->usermeta WHERE meta_key = %s", $meta_key)) ) {
-		if ( delete_metadata( 'user', 0, $meta_key, '', true ) ) {
+		$legacy = delete_metadata( 'user', 0, $meta_key, '', true );
+
+		$meta_key = $wpdb->prefix . $meta_key;
+
+		if ( $legacy || delete_metadata( 'user', 0, $meta_key, '', true ) ) {
 			return true;
 		} else {
 			return false;
@@ -1502,20 +1530,20 @@ function cp_default_args( $pairs, $atts, $shortcode = '' ) {
 if ( !function_exists( 'cp_length' ) ) {
 
 	function cp_length( $text, $excerpt_length ) {
-		/*$text			 = strip_shortcodes( $text );
-		//$text = apply_filters( 'the_content', $text );
-		$excerpt_more	 = '...';
-		$text			 = str_replace( ']]>', ']]&gt;', $text );
-		$text			 = strip_tags( $text );
-		$words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
-		if ( count( $words ) > $excerpt_length ) {
-			array_pop( $words );
-			$text	 = implode( ' ', $words );
-			$text	 = $text . $excerpt_more;
-		} else {
-			$text = implode( ' ', $words );
-		}*/
-		$text = truncateHtml($text, $excerpt_length);
+		/* $text			 = strip_shortcodes( $text );
+		  //$text = apply_filters( 'the_content', $text );
+		  $excerpt_more	 = '...';
+		  $text			 = str_replace( ']]>', ']]&gt;', $text );
+		  $text			 = strip_tags( $text );
+		  $words			 = preg_split( "/[\n\r\t ]+/", $text, $excerpt_length + 1, PREG_SPLIT_NO_EMPTY );
+		  if ( count( $words ) > $excerpt_length ) {
+		  array_pop( $words );
+		  $text	 = implode( ' ', $words );
+		  $text	 = $text . $excerpt_more;
+		  } else {
+		  $text = implode( ' ', $words );
+		  } */
+		$text = truncateHtml( $text, $excerpt_length );
 		return $text;
 	}
 
