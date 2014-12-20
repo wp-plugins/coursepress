@@ -193,7 +193,6 @@ if ( !class_exists( 'Unit' ) ) {
 		}
 
 		function get_previous_unit_from_the_same_course() {
-
 			$units = self::get_units_from_course( $this->course_id );
 
 			$position			 = 0;
@@ -338,7 +337,9 @@ if ( !class_exists( 'Unit' ) ) {
 					// Clear possible cached objects because we're deleting them
 					self::kill( self::TYPE_UNIT, $draft->ID );
 					self::kill( self::TYPE_UNIT_MODULES, $draft->ID );
-					wp_delete_post( $draft->ID, true );
+					if ( get_post_type( $draft->ID ) == 'module' || get_post_type( $draft->ID ) == 'unit' ) {
+						wp_delete_post( $draft->ID, true );
+					}
 				}
 			}
 		}
@@ -359,7 +360,9 @@ if ( !class_exists( 'Unit' ) ) {
 					// Clear possible cached objects because we're deleting them
 					self::kill( self::TYPE_UNIT, $draft->ID );
 					self::kill( self::TYPE_UNIT_MODULES, $draft->ID );
-					wp_delete_post( $draft->ID, true );
+					if ( get_post_type( $draft->ID ) == 'module' || get_post_type( $draft->ID ) == 'unit' ) {
+						wp_delete_post( $draft->ID, true );
+					}
 				}
 			}
 		}
@@ -412,6 +415,7 @@ if ( !class_exists( 'Unit' ) ) {
 
 			$last_inserted_unit_id = $post_id;
 
+			update_post_meta( $post_id, 'unit_pagination', true );
 			update_post_meta( $post_id, 'course_id', (int) $_POST[ 'course_id' ] );
 
 			update_post_meta( $post_id, 'unit_availability', cp_filter_content( $_POST[ 'unit_availability' ] ) );
@@ -419,6 +423,7 @@ if ( !class_exists( 'Unit' ) ) {
 			update_post_meta( $post_id, 'force_current_unit_completion', cp_filter_content( $_POST[ 'force_current_unit_completion' ] ) );
 			update_post_meta( $post_id, 'force_current_unit_successful_completion', cp_filter_content( $_POST[ 'force_current_unit_successful_completion' ] ) );
 
+			//cp_write_log($_POST[ 'page_title' ]);
 			update_post_meta( $post_id, 'page_title', cp_filter_content( $_POST[ 'page_title' ], true ) );
 
 			update_post_meta( $post_id, 'show_page_title', cp_filter_content( $_POST[ 'show_page_title_field' ] ) );
@@ -440,7 +445,11 @@ if ( !class_exists( 'Unit' ) ) {
 		}
 
 		function get_unit_page_name( $page_number ) {
-			return !empty( $this->details->page_title ) ? $this->details->page_title[ (int) ($page_number - 1) ] : '';
+			if ( cp_unit_uses_new_pagination( $this->details->ID ) ) {
+				return !empty( $this->details->page_title[ 'page_' . $page_number ] ) ? $this->details->page_title[ 'page_' . (int) $page_number ] : '';
+			} else {
+				return !empty( $this->details->page_title ) ? $this->details->page_title[ (int) ($page_number - 1) ] : '';
+			}
 		}
 
 		function delete_unit( $force_delete ) {
@@ -470,7 +479,9 @@ if ( !class_exists( 'Unit' ) ) {
 			$course_id = $this->course_id;
 			self::kill_related( self::TYPE_COURSE, $course_id );
 
-			wp_delete_post( $this->id, $force_delete ); //Whether to bypass trash and force deletion
+			if ( get_post_type( $this->id ) == 'unit' ) {
+				wp_delete_post( $this->id, $force_delete ); //Whether to bypass trash and force deletion
+			}
 			//Delete unit modules
 
 			$args = array(
@@ -562,10 +573,12 @@ if ( !class_exists( 'Unit' ) ) {
 				)
 				);
 			} else {
-				$post_id = cp_get_id_by_post_name($slug);
-				$post = get_post( $post_id );
+				$post_id = cp_get_id_by_post_name( $slug );
+				$post	 = get_post( $post_id );
 			}
-			
+
+			$post = !empty( $post ) && is_array( $post ) ? array_pop( $post ) : $post;
+
 			return !empty( $post ) ? $post->ID : false;
 		}
 

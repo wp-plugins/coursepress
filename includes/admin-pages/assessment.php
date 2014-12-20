@@ -261,7 +261,7 @@ if( is_multisite() ) {
                                 $classes = 'all';
                             }
 
-                            if ( $classes !== 'all' ) {
+                            /*if ( $classes !== 'all' ) {
                                 $args = array(
                                     'meta_query' => array(
                                         array(
@@ -276,7 +276,7 @@ if( is_multisite() ) {
                                             'key' => $class_meta_query_key
                                         ) )
                                 );
-                            }
+                            }*/
 
                             //$student_search = new WP_User_Query( $args );
 
@@ -322,6 +322,7 @@ if( is_multisite() ) {
                                     </thead>
 
                                     <?php
+					
                                     foreach ( $student_search->get_results() as $user ) {
                                         $style = ( isset($style) && 'alternate' == $style ) ? '' : ' alternate';
                                         $user_object = new Student($user->ID);
@@ -464,7 +465,7 @@ if( is_multisite() ) {
                                                                 }
                                                                 if ( isset($comment) ) {
                                                                     ?>
-                                                                    <a class="response_comment" alt="<?php echo esc_attr($comment); ?>" title="<?php echo esc_attr($comment); ?>">✓</a>
+                                                                    <a class="response_comment" alt="<?php echo esc_attr(strip_tags($comment)); ?>" title="<?php echo esc_attr(strip_tags($comment)); ?>">✓</a>
                                                                     <?php
                                                                 } else {
                                                                     echo '-';

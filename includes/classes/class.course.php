@@ -1,9 +1,48 @@
 <?php
+/**
+ * This file defines the Course class.
+ *
+ * @copyright Incsub (http://incsub.com/)
+ *
+ * @license http://opensource.org/licenses/GPL-2.0 GNU General Public License, version 2 (GPL-2.0)
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+ * MA 02110-1301 USA
+ *
+ */
+
 if ( !defined( 'ABSPATH' ) )
 	exit; // Exit if accessed directly
 
 if ( !class_exists( 'Course' ) ) {
 
+	/**
+	 * This class defines the methods and properties of a Course in CoursePress.
+	 *
+	 * A Course object has all the required methods to manage the Course custom
+	 * post type, and the surrounding meta data used to create courses in CoursePress.
+	 *
+	 * A course is typically also the parent post for a Unit[].
+	 *
+	 * If creating a Course object outside of CoursePress make sure that CoursePress
+	 * has already loaded. Hooking 'plugins_loaded' should do the trick.
+	 *
+	 * @todo Make sure we need !class_exists as it should be require_once() anyway.
+	 *
+	 * @since 1.0.0
+	 * @package CoursePress
+	 */
 	class Course extends CoursePress_Object {
 
 		var $id		 = '';
@@ -12,6 +51,17 @@ if ( !class_exists( 'Course' ) ) {
 		var $details;
 		var $data	 = array();
 
+		/**
+		 * The Course constructor.
+		 *
+		 * The constructor makes sure that it uses the WordPress Object cache to make
+		 * subsequent access less resource heavy.
+		 *
+		 * Note: The actual post gets loaded in Course::$details;
+		 *
+		 * @param string $id
+		 * @param string $output
+		 */
 		function __construct( $id = '', $output = 'OBJECT' ) {
 			$this->id		 = $id;
 			$this->output	 = $output;
@@ -28,9 +78,6 @@ if ( !class_exists( 'Course' ) ) {
 				// Cache the course object
 				self::cache( self::TYPE_COURSE, $this->id, $this->details );
 
-				// cp_write_log( 'Course[' . $this->id . ']: Saved to cache..');
-			} else {
-				// cp_write_log( 'Course[' . $this->id . ']: Loaded from cache...');
 			};
 
 			/**
@@ -41,10 +88,19 @@ if ( !class_exists( 'Course' ) ) {
 			do_action( 'coursepress_course_init', $this );
 		}
 
+		// PHP legacy constructor
 		function Course( $id = '', $output = 'OBJECT' ) {
 			$this->__construct( $id, $output );
 		}
 
+		/**
+		 * Initialises a Course object.
+		 *
+		 * If there is no post title defined it will create a default. It also assigns additional
+		 * metadata to the Course object.
+		 *
+		 * @param $course
+		 */
 		function init_course( &$course ) {
 			if ( !empty( $course ) ) {
 				if ( !isset( $course->post_title ) || $course->post_title == '' ) {
@@ -59,10 +115,25 @@ if ( !class_exists( 'Course' ) ) {
 			}
 		}
 
+		/**
+		 * Gets the actual WordPress post object for a Course.
+		 *
+		 * @return bool|null|WP_Post
+		 */
 		function get_course() {
 			return !empty( $this->details ) ? $this->details : false;
 		}
 
+		/**
+		 * Renders the course structure.
+		 *
+		 * Used in shortcodes on the front end to render the course hierarchy.
+		 *
+		 * @param string $try_title
+		 * @param bool $show_try
+		 * @param bool $hide_title
+		 * @param bool $echo
+		 */
 		function course_structure_front( $try_title = '', $show_try = true, $hide_title = false, $echo = true ) {
 			$show_unit		 = $this->details->show_unit_boxes;
 			$preview_unit	 = $this->details->preview_unit_boxes;
@@ -182,7 +253,7 @@ if ( !class_exists( 'Course' ) ) {
 				}
 
 				function is_open_ended() {
-					
+
 				}
 
 				static function get_course_featured_url( $course_id = false ) {
@@ -339,7 +410,9 @@ if ( !class_exists( 'Course' ) ) {
 						// Remove product if its not a paid course (clean up MarketPress products)
 					} elseif ( isset( $_POST[ 'meta_paid_course' ] ) && 'off' == $_POST[ 'meta_paid_course' ] ) {
 						if ( $mp_product_id && 0 != $mp_product_id ) {
-							wp_delete_post( $mp_product_id );
+							if ( get_post_type( $mp_product_id ) == 'product' ) {
+								wp_delete_post( $mp_product_id );
+							}
 							delete_post_meta( $this->id, 'mp_product_id' );
 							delete_post_meta( $this->id, 'marketpress_product' );
 						}
@@ -421,7 +494,6 @@ if ( !class_exists( 'Course' ) ) {
 									}
 								}
 							} // meta_course_category
-
 							//Add featured image
 							if ( ( 'meta_featured_url' == $key || '_thumbnail_id' == $key ) && ( isset( $_POST[ '_thumbnail_id' ] ) && is_numeric( $_POST[ '_thumbnail_id' ] ) || isset( $_POST[ 'meta_featured_url' ] ) && $_POST[ 'meta_featured_url' ] !== '' ) ) {
 
@@ -430,7 +502,7 @@ if ( !class_exists( 'Course' ) ) {
 
 								$upload_dir_info = wp_upload_dir();
 
-								$fl				 = trailingslashit( $upload_dir_info[ 'path' ] ) . basename( $_POST[ 'meta_featured_url' ] );
+								$fl = trailingslashit( $upload_dir_info[ 'path' ] ) . basename( $_POST[ 'meta_featured_url' ] );
 
 								$image = wp_get_image_editor( $fl ); // Return an implementation that extends <tt>WP_Image_Editor</tt>
 
@@ -532,8 +604,9 @@ if ( !class_exists( 'Course' ) ) {
 					self::kill( self::TYPE_COURSE, $this->id );
 					self::kill_related( self::TYPE_COURSE, $this->id );
 
-					wp_delete_post( $this->id, $force_delete ); //Whether to bypass trash and force deletion
-
+					if ( get_post_type( $this->id ) == 'course' ) {
+						wp_delete_post( $this->id, $force_delete ); //Whether to bypass trash and force deletion
+					}
 					/* Delete all usermeta associated to the course */
 					cp_delete_user_meta_by_key( 'course_' . $this->id );
 					cp_delete_user_meta_by_key( 'enrolled_course_date_' . $this->id );
@@ -879,7 +952,7 @@ if ( !class_exists( 'Course' ) ) {
 					delete_post_meta( $new_course_id, 'auto_sku' );
 					delete_post_meta( $new_course_id, 'paid_course' );
 					delete_post_meta( $new_course_id, 'marketpress_product' );
-					
+
 
 					$units = $this->get_units( $old_course_id );
 
@@ -889,6 +962,27 @@ if ( !class_exists( 'Course' ) ) {
 					}
 
 					do_action( 'coursepress_course_duplicated', $new_course_id );
+				}
+
+				public function enrollment_details() {
+
+					$this->enroll_type			 = get_post_meta( $this->id, 'enroll_type', true );
+					$this->course_start_date	 = get_post_meta( $this->id, 'course_start_date', true );
+					$this->course_end_date		 = get_post_meta( $this->id, 'course_end_date', true );
+					$this->enrollment_start_date = get_post_meta( $this->id, 'enrollment_start_date', true );
+					$this->enrollment_end_date	 = get_post_meta( $this->id, 'enrollment_end_date', true );
+					$this->open_ended_course	 = 'off' == get_post_meta( $this->id, 'open_ended_course', true ) ? false : true;
+					$this->open_ended_enrollment = 'off' == get_post_meta( $this->id, 'open_ended_enrollment', true ) ? false : true;
+					$this->prerequisite			 = get_post_meta( $this->id, 'prerequisite', true );
+
+					$this->is_paid	 = get_post_meta( $this->id, 'paid_course', true );
+					$this->is_paid	 = $this->is_paid && 'on' == $this->is_paid ? true : false;
+
+					$this->course_started		 = strtotime( $this->course_start_date ) <= current_time( 'timestamp', 0 ) ? true : false;
+					$this->enrollment_started	 = strtotime( $this->enrollment_start_date ) <= current_time( 'timestamp', 0 ) ? true : false;
+					$this->course_expired		 = strtotime( $this->course_end_date ) < current_time( 'timestamp', 0 ) ? true : false;
+					$this->enrollment_expired	 = strtotime( $this->enrollment_end_date ) < current_time( 'timestamp', 0 ) ? true : false;
+					$this->full					 = $this->is_populated();
 				}
 
 			}

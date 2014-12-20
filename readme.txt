@@ -1,8 +1,8 @@
 ﻿=== Plugin Name ===
 Contributors: wpmudev
 Tags: elearning, lms, education, courses, lessons, assignments, students, teachers
-Requires at least: 4.0
-Tested up to: 4.0
+Requires at least: 4.1
+Tested up to: 4.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -80,7 +80,24 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
-== Changelog ==
+= 1.2.3.4 =
+
+* Added additional instructor capability for managing Course Categories
+* Added unit elements preloader
+* Course completion actions added for developers: 'coursepress_student_course_completed', 'coursepress_student_course_unit_completed'
+* Unit completion actions added for developers: 'coursepress_student_course_unit_pages_viewed', 'coursepress_student_course_unit_mandatory_question_answered', 'coursepress_student_course_unit_gradable_question_passed'
+* New options for "Who can enroll" when not allowing anyone to register to your site.
+* Fixed WordPress 4.1 issues (hidden course list in the admin, hidden assessment list)
+* Fixed "administrator" role for network sites.
+  CoursePress menus and permissions now work properly for new sites.
+  For old sites the administrator's role will have to be reset (change to "subscriber" then back to "administrator").
+* Fixed shortcode typos on the settings page
+* Fixed issue with prerequisite courses for non-logged-in users
+* Fixed issues with enrollment/signup button
+* Fixes issue with unit editors upon reordering elements (Firefox)
+* Strip html tags from the assessment comment ALT and TITLE
+* Fixed issues with dummy course not being created upon first install 
+* Other code improvements
 
 = 1.2.3.3 =
 * Fixed issue with thumbnails not displaying or getting generated for courses.

@@ -13,6 +13,12 @@
   return $url;
   } */
 
+function cp_unit_uses_new_pagination( $unit_id = false ) {
+	$unit_pagination_meta	 = get_post_meta( $unit_id, 'unit_pagination', true );
+	$unit_pagination		 = isset( $unit_pagination_meta ) && !empty( $unit_pagination_meta ) && $unit_pagination_meta !== false ? true : false;
+	return $unit_pagination;
+}
+
 function cp_get_id_by_post_name( $post_name ) {
 	global $wpdb;
 	$id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name = '%s'", $post_name ) );
@@ -418,16 +424,39 @@ function coursepress_unit_module_pagination_ellipsis( $unit_id, $pages_num ) {
 	echo '</ul></div>' . "\n";
 }
 
-function coursepress_unit_pages( $unit_id ) {
+function coursepress_unit_pages( $unit_id, $unit_pagination = false ) {
 
-	$pages_num = 1;
+	if ( $unit_pagination ) {
 
-	$module	 = new Unit_Module;
-	$modules = $module->get_modules( $unit_id );
+		$args = array(
+			'post_type'		 => 'module',
+			'post_status'	 => 'publish',
+			'posts_per_page' => 1,
+			'post_parent'	 => $unit_id,
+			'meta_key'		 => 'module_page',
+			'orderby'		 => 'meta_value_num',
+			'order'			 => 'DESC'
+		);
 
-	foreach ( $modules as $mod ) {
-		if ( $module->get_module_type( $mod->ID ) == 'page_break_module' ) {
-			$pages_num++;
+		$modules	 = get_posts( $args );
+		$module_id	 = isset( $modules[ 0 ] ) ? $modules[ 0 ]->ID : 0;
+
+		if ( $module_id > 0 ) {
+			$pages_num = count(get_post_meta( $unit_id, 'page_title', true ));
+			//$pages_num = get_post_meta( $module_id, 'module_page', true );
+		} else {
+			$pages_num = 1;
+		}
+	} else {
+		$pages_num = 1;
+
+		$module	 = new Unit_Module;
+		$modules = $module->get_modules( $unit_id );
+
+		foreach ( $modules as $mod ) {
+			if ( $module->get_module_type( $mod->ID ) == 'page_break_module' ) {
+				$pages_num++;
+			}
 		}
 	}
 

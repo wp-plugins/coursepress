@@ -1,3 +1,4 @@
+var global_iframe_content = '';
 jQuery( document ).ready( function( $ ) {
 
     $( 'input.audio_url, input.video_url, input.image_url, input.featured_url, input.course_video_url' ).live( 'input propertychange paste change', function() {
@@ -94,18 +95,31 @@ jQuery( document ).ready( function( $ ) {
         var current_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
         var elements_count = jQuery( '#unit-page-' + current_page + ' .modules_accordion .module-holder-title' ).length;
 
-        if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
-            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+        if ( coursepress.unit_pagination == 0 ) {
+            if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
+                jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+            } else {
+                jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+            }
         } else {
-            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+            if ( elements_count == 0 ) {
+                jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+            } else {
+                jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+            }
         }
     } );
 
     jQuery( '.delete_unit_page .button-delete-unit' ).live( "click", function() {
+
         var current_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
+        var current_page_id = $( '#unit-pages .ui-tabs-nav .ui-state-active a' ).attr( 'href' );
 
         if ( delete_unit_page_and_elements_confirmed() ) {
-            jQuery( '#unit-page-' + current_page + ' .element_id' ).each( function( i, obj ) {
+            jQuery( '#unit-pages' ).css( 'display', 'none' );
+            jQuery( '.unit_pages_delete' ).css( 'display', 'block' );
+
+            jQuery( current_page_id + ' .element_id' ).each( function( i, obj ) {
                 prepare_element_for_execution( jQuery( this ).val() );
                 jQuery( this ).closest( '.module-holder-title' ).remove();
             } );
@@ -117,9 +131,11 @@ jQuery( document ).ready( function( $ ) {
 
             jQuery( '#unit-pages .ui-tabs-nav .ui-state-active' ).remove();
 
-            jQuery( '#unit-page-' + current_page ).remove();
-
+            //reenumarate_unit_pages();
+            jQuery( current_page_id ).remove();
+            //cp_repaint_all_editors();
             reenumarate_unit_pages();
+
 
             /*if (current_page == 1) {
              active_num = 1;
@@ -140,10 +156,39 @@ jQuery( document ).ready( function( $ ) {
             jQuery( "#unit-pages" ).tabs( { active: 0 } );
 
             current_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
+            current_page_id = $( '#unit-pages .ui-tabs-nav .ui-state-active a' ).attr( 'href' );
+
+            var elements_count = jQuery( current_page_id + ' .modules_accordion .module-holder-title' ).length;
+
+            if ( coursepress.unit_pagination == 0 ) {
+                if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
+                    jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+                } else {
+                    jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+                }
+            } else {
+                if ( elements_count == 0 ) {
+                    jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+                } else {
+                    jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+                }
+            }
+
+
 
             if ( typeof current_page === "undefined" ) {
                 jQuery( "#unit-pages" ).tabs( { active: 1 } );
             }
+
+            update_module_page_number();
+            update_unit_page_order_and_numbers();
+            //cp_repaint_all_editors();
+
+            jQuery( '.unit-pages-navigation' ).css( 'opacity', '1' );
+
+
+
+            jQuery( '.unit-control-buttons .save-unit-button' ).click();
         }
 
         function reenumarate_unit_pages() {
@@ -209,7 +254,7 @@ jQuery( document ).ready( function( $ ) {
         var id = "unit-page-" + next_page;
         var li = '<li><a href="#' + id + '">' + next_page + '</a><span class="arrow-down"></span></li>';
         var tabs_html = jQuery( '.ui-tabs-nav' ).html();
-        var add_page_plus = '<li class="ui-state-default ui-corner-top"><a id="add_new_unit_page" class="ui-tabs-anchor">+</a></li>';
+        var add_page_plus = '<li class="ui-state-default ui-corner-top add_new_unit_page"><a id="add_new_unit_page" class="ui-tabs-anchor">+</a></li>';
 
         tabs_html = tabs_html.replace( add_page_plus, '' );
 
@@ -220,6 +265,8 @@ jQuery( document ).ready( function( $ ) {
         tabs.tabs( "refresh" );
 
         jQuery( '#unit-page-' + next_page + ' .page_title' ).val( '' );
+        jQuery( '#unit-page-' + next_page + ' .page_title' ).attr( 'name', 'page_title[page_' + next_page + ']' );
+        jQuery( '#unit-page-' + next_page + ' .page_title' ).attr( 'id', 'page_title[page_' + next_page + ']' );
 
         /*jQuery( '#unit-page-' + next_page + ' .modules_accordion' ).accordion( {
          heightStyle: "content",
@@ -302,7 +349,7 @@ jQuery( document ).ready( function( $ ) {
         var cloned = jQuery( '.draggable-module-holder-page_break_module' ).html();
         cloned = '<div class="module-holder-page_break_module module-holder-title" id="' + rand_id + '_temp">' + cloned + '</div>';
 
-        jQuery( '#unit-page-' + next_page + ' .modules_accordion' ).append( cloned );
+        //jQuery( '#unit-page-' + next_page + ' .modules_accordion' ).append( cloned );
 
         jQuery( '#unit-page-' + next_page + ' .modules_accordion' ).accordion( "refresh" );
 
@@ -402,6 +449,241 @@ function coursepress_no_elements( elements_number ) {
 
 }
 
+
+function update_sortable_module_indexes_page_sort( page_id, page_num ) {
+    // alert(page_num);
+    jQuery( '#' + page_id + ' .module_order' ).each( function( i, obj ) {
+        jQuery( this ).val( page_num * ( i + 1 ) );
+    } );
+    /*
+     *  jQuery( '#' + page_id + ' .module_page' ).each( function( i, obj ) {
+     jQuery( this ).val( page_num );
+     } );
+     * 
+     */
+
+
+    jQuery( "input[name*='audio_module_loop']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "audio_module_loop[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+
+    jQuery( "input[name*='audio_module_autoplay']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "audio_module_autoplay[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+
+    jQuery( "input[name*='radio_answers']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "radio_input_module_radio_answers[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+    jQuery( "input[name*='radio_check']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "radio_input_module_radio_check[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+    jQuery( "input[name*='checkbox_answers']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "checkbox_input_module_checkbox_answers[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+    jQuery( "input[name*='checkbox_check']" ).each( function( i, obj ) {
+        jQuery( this ).attr( "name", "checkbox_input_module_checkbox_check[" + jQuery( this ).closest( ".module-content" ).find( '.module_order' ).val() + '][]' );
+    } );
+
+    var current_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
+    var elements_count = jQuery( '#unit-page-' + current_page + ' .modules_accordion .module-holder-title' ).length;
+
+    if ( coursepress.unit_pagination == 0 ) {
+        if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+        } else {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+        }
+    } else {
+        if ( elements_count == 0 ) {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+        } else {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+        }
+    }
+}
+
+function update_module_page_number() {
+    var curr_page = 1;
+    jQuery( '#unit-pages li.ui-state-default' ).each( function( i, obj ) {
+        if ( $( this ).find( 'a.ui-tabs-anchor' ).attr( 'id' ) !== 'add_new_unit_page' ) {
+            //$( '#unit-pages #unit-page-' + $( this ).find( 'a.ui-tabs-anchor' ).text() ).attr( 'data-weight', i + 1 );
+            //$( this ).find( 'a.ui-tabs-anchor' ).text( i + 1 );
+
+            var holder_id = $( this ).find( 'a.ui-tabs-anchor' ).attr( 'href' );
+            var res = holder_id.replace( "unit-page-", "" );
+
+            $( holder_id ).find( '.module_page' ).val( curr_page );
+            curr_page++;
+        }
+    } );
+}
+
+
+function update_unit_page_order_and_numbers() {
+    jQuery( '.unit-pages-navigation' ).css( 'opacity', '0.5' );
+    var curr_page = 1;
+
+    jQuery( '#unit-pages li.ui-state-default' ).each( function( i, obj ) {
+        if ( $( this ).find( 'a.ui-tabs-anchor' ).attr( 'id' ) !== 'add_new_unit_page' ) {
+            $( '#unit-pages #unit-page-' + $( this ).find( 'a.ui-tabs-anchor' ).text() ).attr( 'data-weight', i + 1 );
+            $( this ).find( 'a.ui-tabs-anchor' ).text( i + 1 );
+
+            var holder_id = $( this ).find( 'a.ui-tabs-anchor' ).attr( 'href' );
+            var res = holder_id.replace( "unit-page-", "" );
+
+            $( holder_id ).find( '.module_page' ).val( curr_page );
+            $( holder_id ).find( '.page_title' ).attr( 'name', 'page_title[page_' + curr_page + ']' );
+            $( holder_id ).find( '.page_title' ).attr( 'id', 'page_title[page_' + curr_page + ']' );
+            curr_page++;
+        }
+    } );
+
+    var $wrapper = $( '#unit-pages' ),
+        $unit_pages = $wrapper.find( '.unit-page-holder' );
+    [ ].sort.call( $unit_pages, function( a, b ) {
+        return +$( a ).attr( 'data-weight' ) - +$( b ).attr( 'data-weight' );
+    } );
+
+    $unit_pages.each( function() {
+        $wrapper.append( this );
+    } );
+
+}
+
+function cp_repaint_current_page_editors() {
+    /* Dynamic WP Editor */
+
+    var current_page = jQuery( ".unit-page-holder[aria-expanded='true']" );
+    var current_page_id = current_page.attr( 'id' );
+
+    jQuery( '#' + current_page_id + ' .wp-editor-wrap' ).each( function( i, obj ) {
+
+        var nth_child_num = i + 1;
+        var editor_id = $( this ).attr( 'id' );
+        var initial_editor_id = editor_id;
+
+        editor_id = editor_id.replace( "-wrap", "" );
+        editor_id = editor_id.replace( "wp-", "" );
+        //editor_content = get_tinymce_content_new( editor_id );
+
+        tinyMCE.init( {
+// General options
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+        } );
+
+        /*var iframe_id = $( this ).find( 'iframe' ).attr( 'id' );
+         var iframe_content = document.getElementById( iframe_id ).contentWindow.document.body.innerHTML;
+         //console.log('iframe id: '+iframe_id);
+         //console.log( iframe_content );
+         
+         editor_content = iframe_content;//tinyMCE.get( editor_id ).getContent();*/
+
+        editor_content = tinyMCE.get( editor_id ).getContent();
+
+        var textarea_name = ( jQuery( '#' + initial_editor_id + ' textarea' ).attr( 'name' ) );
+        var rand_id = 'rand_id' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 );
+        var text_editor = '<textarea name="' + textarea_name + '" id="' + rand_id + '">' + editor_content + '</textarea>';
+
+        var switches = '<a id="' + rand_id + '-html" class="wp-switch-editor switch-html" onclick="switchEditors.switchto(this);">Text</a>';
+        switches += '<a id="' + rand_id + '-tmce" class="wp-switch-editor switch-tmce" onclick="switchEditors.switchto(this);">Visual</a>';
+
+        var text_editor_whole =
+            '<div id="wp-' + rand_id + '-wrap" class="wp-core-ui wp-editor-wrap tmce-active">' +
+            '<div id="wp-' + rand_id + '-editor-tools" class="wp-editor-tools hide-if-no-js">' +
+            '<div id="wp-' + rand_id + '-media-buttons" class="wp-media-buttons"><a href="#" class="button insert-media-cp add_media" data-editor="' + rand_id + '" title="Add Media"><span class="wp-media-buttons-icon"></span> Add Media</a></div>';
+        text_editor_whole += coursepress_editor.quicktags ? '<div class="wp-editor-tabs">' + switches + '</div>' : '';
+        text_editor_whole += '<div id="wp-' + rand_id + '-editor-container" class="wp-editor-container">' +
+            text_editor +
+            '</div></div></div>';
+        jQuery( '#' + initial_editor_id ).parent().html( text_editor_whole );
+
+        tinyMCE.init( {
+            mode: "exact",
+            elements: rand_id,
+            plugins: coursepress_editor.plugins.join( ',' ),
+            toolbar: coursepress_editor.toolbar.join( ',' ),
+            theme: coursepress_editor.theme,
+            skin: coursepress_editor.skin,
+            menubar: false
+        } );
+
+        // Init Quicktags
+        if ( coursepress_editor.quicktags ) {
+            new QTags( rand_id );
+            QTags._buttonsInit();
+            // force the editor to start at its defined mode.
+            switchEditors.go( rand_id, tinyMCE.editors[rand_id] );
+        }
+    } );
+
+    tinyMCE.execCommand( 'mceRepaint' );
+}
+
+function cp_repaint_all_editors() {
+
+    /* REPAINT ALL EDITORS AFTER RESORTING PAGES */
+    //update_sortable_module_indexes();
+    //ui.draggable.attr( 'id' ) or ui.draggable.get( 0 ).id or ui.draggable[0].id
+
+    /* Dynamic WP Editor */
+    jQuery( '.unit-page-holder .wp-editor-wrap' ).each( function( i, obj ) {
+
+        var nth_child_num = i + 1;
+        var editor_id = $( this ).attr( 'id' );
+        var initial_editor_id = editor_id;
+
+        editor_id = editor_id.replace( "-wrap", "" );
+        editor_id = editor_id.replace( "wp-", "" );
+        //editor_content = get_tinymce_content_new( editor_id );
+
+        tinyMCE.init( {
+// General options
+            mode: "specific_textareas",
+            editor_selector: "mceEditor",
+        } );
+
+        editor_content = tinyMCE.get( editor_id ).getContent();
+
+        var textarea_name = ( jQuery( '#' + initial_editor_id + ' textarea' ).attr( 'name' ) );
+        var rand_id = 'rand_id' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 );
+        var text_editor = '<textarea name="' + textarea_name + '" id="' + rand_id + '">' + editor_content + '</textarea>';
+
+        var switches = '<a id="' + rand_id + '-html" class="wp-switch-editor switch-html" onclick="switchEditors.switchto(this);">Text</a>';
+        switches += '<a id="' + rand_id + '-tmce" class="wp-switch-editor switch-tmce" onclick="switchEditors.switchto(this);">Visual</a>';
+
+        var text_editor_whole =
+            '<div id="wp-' + rand_id + '-wrap" class="wp-core-ui wp-editor-wrap tmce-active">' +
+            '<div id="wp-' + rand_id + '-editor-tools" class="wp-editor-tools hide-if-no-js">' +
+            '<div id="wp-' + rand_id + '-media-buttons" class="wp-media-buttons"><a href="#" class="button insert-media-cp add_media" data-editor="' + rand_id + '" title="Add Media"><span class="wp-media-buttons-icon"></span> Add Media</a></div>';
+        text_editor_whole += coursepress_editor.quicktags ? '<div class="wp-editor-tabs">' + switches + '</div>' : '';
+        text_editor_whole += '<div id="wp-' + rand_id + '-editor-container" class="wp-editor-container">' +
+            text_editor +
+            '</div></div></div>';
+        jQuery( '#' + initial_editor_id ).parent().html( text_editor_whole );
+
+        tinyMCE.init( {
+            mode: "exact",
+            elements: rand_id,
+            plugins: coursepress_editor.plugins.join( ',' ),
+            toolbar: coursepress_editor.toolbar.join( ',' ),
+            theme: coursepress_editor.theme,
+            skin: coursepress_editor.skin,
+            menubar: false
+        } );
+
+        // Init Quicktags
+        if ( coursepress_editor.quicktags ) {
+            new QTags( rand_id );
+            QTags._buttonsInit();
+            // force the editor to start at its defined mode.
+            switchEditors.go( rand_id, tinyMCE.editors[rand_id] );
+        }
+    } );
+
+    tinyMCE.execCommand( 'mceRepaint' );
+}
+
 function coursepress_modules_ready() {
 
     jQuery( '.draggable-module' ).draggable( {
@@ -414,6 +696,7 @@ function coursepress_modules_ready() {
 
         }
     } );
+
     jQuery( '.elements-holder div.output-element, .elements-holder div.input-element' ).live( 'click', function() {//.unit-module-add, 
 
         var current_unit_page = 0;//current selected unit page
@@ -510,7 +793,7 @@ function coursepress_modules_ready() {
             skin: coursepress_editor.skin,
             menubar: false,
             height: '360px',
-            content_css: coursepress_units.cp_editor_style,
+            content_css: coursepress.cp_editor_style,
         } );
 
         // Init Quicktags
@@ -528,10 +811,18 @@ function coursepress_modules_ready() {
         jQuery( this ).parent().parent().find( '.modules_accordion div.module-holder-title' ).last().find( '.module-title' ).attr( 'data-panel', accordion_elements_count );
         jQuery( this ).parent().parent().find( '.modules_accordion div.module-holder-title' ).last().find( '.module-title' ).attr( 'data-id', -1 );
 
-        if ( ( current_unit_page == 1 && accordion_elements_count == 0 ) || ( current_unit_page >= 2 && accordion_elements_count == 1 ) ) {
-            jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).show();
+        if ( coursepress.unit_pagination == 0 ) {
+            if ( ( current_unit_page == 1 && accordion_elements_count == 0 ) || ( current_unit_page >= 2 && accordion_elements_count == 1 ) ) {
+                jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).show();
+            } else {
+                jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).hide();
+            }
         } else {
-            jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).hide();
+            if ( accordion_elements_count == 0 ) {
+                jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).show();
+            } else {
+                jQuery( '#unit-page-' + current_unit_page + ' .elements-holder .no-elements' ).hide();
+            }
         }
 
         jQuery.post(
@@ -545,6 +836,8 @@ function coursepress_modules_ready() {
             jQuery( '#' + rand_id + '_temp' ).find( '.element_id' ).val( data );
         } );
 
+        //update_unit_page_order_and_numbers();
+        update_module_page_number();
     } );
 }
 
@@ -595,10 +888,18 @@ function update_sortable_module_indexes() {
     var current_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
     var elements_count = jQuery( '#unit-page-' + current_page + ' .modules_accordion .module-holder-title' ).length;
 
-    if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
-        jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+    if ( coursepress.unit_pagination == 0 ) {
+        if ( ( current_page == 1 && elements_count == 0 ) || ( current_page >= 2 && elements_count == 1 ) ) {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+        } else {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+        }
     } else {
-        jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+        if ( elements_count == 0 ) {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).show();
+        } else {
+            jQuery( '#unit-page-' + current_page + ' .elements-holder .no-elements' ).hide();
+        }
     }
 }
 
@@ -921,6 +1222,17 @@ jQuery( document ).ready( function() {
     var editor_content = '';
 
 //#unit-page-' + current_unit_page + ' .modules_accordion'
+
+    jQuery( '.module-title' ).live( 'mousedown', function() {
+        var holder = jQuery( this ).parent();
+        var iframe_id = jQuery( holder ).find( 'iframe' ).attr( 'id' );
+        var iframe_content = document.getElementById( iframe_id ).contentWindow.document.body.innerHTML;
+        global_iframe_content = iframe_content;
+        console.log( global_iframe_content );
+        //alert(global_iframe_content);
+        //alert(iframe_content);
+    } );
+
     jQuery( '.modules_accordion' ).accordion( {
         heightStyle: "content",
         header: "> div > h3",
@@ -930,19 +1242,34 @@ jQuery( document ).ready( function() {
         //items: "div:not(.notmovable)",
         handle: "h3",
         axis: "y",
+        start: function( event, ui ) {
+            //$( "#editor_2380_ifr" ).contents().find( "p" ).css( "background-color", "#BADA55" );
+        },
         stop: function( event, ui ) {
+            //alert('test');
 
+
+            current_unit_page = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
             update_sortable_module_indexes();
             //ui.draggable.attr( 'id' ) or ui.draggable.get( 0 ).id or ui.draggable[0].id
+            //cp_repaint_current_page_editors();
 
             /* Dynamic WP Editor */
             var nth_child_num = ui.item.index() + 1;
-            var editor_id = jQuery( ".module-holder-title:nth-child( " + nth_child_num + " ) .wp-editor-wrap" ).attr( 'id' );
+            var editor_id = jQuery( "#unit-page-" + current_unit_page + " .module-holder-title:nth-child( " + nth_child_num + " ) .wp-editor-wrap" ).attr( 'id' );
+
             var initial_editor_id = editor_id;
 
             editor_id = editor_id.replace( "-wrap", "" );
             editor_id = editor_id.replace( "wp-", "" );
-            editor_content = get_tinymce_content( editor_id );
+
+            /*var iframe_id = jQuery( '#' + initial_editor_id ).find( 'iframe' ).attr( 'id' );
+             alert( iframe_id );
+             var iframe_content = document.getElementById( iframe_id ).contentWindow.document.body.innerHTML;
+             alert( iframe_content );*/
+            //var iframe_content = jQuery( '#' + editor_id + '_ifr' ).contents().find( '#tinymce' );
+            //alert($('.editor_in_place textarea').val());
+            editor_content = global_iframe_content;//get_tinymce_content( editor_id );
 
             var textarea_name = ( jQuery( '#' + initial_editor_id + ' textarea' ).attr( 'name' ) );
             var rand_id = 'rand_id' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 ) + '_' + Math.floor( ( Math.random() * 99999 ) + 100 );
@@ -970,6 +1297,9 @@ jQuery( document ).ready( function() {
                 skin: coursepress_editor.skin,
                 menubar: false
             } );
+
+            //tinyMCE.EditorManager.execCommand( 'mceFocus', false, rand_id );
+            //tinyMCE.activeEditor.setContent( global_iframe_content );
 
             // Init Quicktags
             if ( coursepress_editor.quicktags ) {
@@ -1338,4 +1668,35 @@ jQuery( document ).ready( function( $ ) {
             update_course_sortable_indexes();
         }
     } );
+
+    function prepare_element_to_delete( module_to_execute_id ) {
+        jQuery( '<input>' ).attr( {
+            type: 'hidden',
+            name: 'modules_to_execute[]',
+            value: module_to_execute_id
+        } ).appendTo( '#unit-add' );
+    }
+
+    update_unit_page_order_and_numbers();
+    /*
+     jQuery( "#unit-pages ul" ).sortable( {
+     placeholder: "unit-page-placeholder",
+     //items: "",
+     items: "li:not( .add_new_unit_page, .unit-pages-title )",
+     activate: function( event, ui ) {
+     //alert( 'received!' );
+     jQuery( '.unit-pages-navigation' ).css( 'opacity', '0.7' );
+     },
+     update: function( event, ui ) {
+     update_unit_page_order_and_numbers();
+     cp_repaint_all_editors();
+     jQuery( '.unit-pages-navigation' ).css( 'opacity', '1' );
+     //update_sortable_module_indexes_page_sort();
+     },
+     stop: function( event, ui ) {
+     jQuery( '.unit-pages-navigation' ).css( 'opacity', '1' );
+     }
+     } );
+     */
+
 } );

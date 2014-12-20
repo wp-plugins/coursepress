@@ -26,6 +26,60 @@
 
 #unit-pages{
     border: 0px;
+    display: none;
+}
+
+.unit_pages_preloader{
+    width: 100%; 
+    height: 105px; 
+    background: #fff;
+    display: block;
+}
+
+.unit-page-placeholder{
+    padding-bottom: 0px !important;
+    background: #fff;
+    border: 1px dashed #0074a2;
+    width: 30px;
+    height: 25px;
+}
+
+.unit_pages_delete{
+    width: 100%; 
+    height: 105px; 
+    background: #fff;
+    display: none;
+}
+
+.unit_pages_delete_message{
+    padding-bottom: 0px !important;
+    background: #fff;
+    width: 30px;
+    height: 25px;
+}
+
+.unit_pages_delete .unit_pages_delete_message{
+    width: 200px;
+    height: 34px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 100px;
+    font-size: 14px;
+    color: #72788c;
+    text-align: center;
+    display: block
+}
+
+.unit_pages_preloader .preloader_image{
+    width: 200px;
+    height: 34px;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 100px;
+    font-size: 14px;
+    color: #72788c;
+    text-align: center;
+    display: block
 }
 
 .arrow-down {
@@ -1591,6 +1645,10 @@ a.delete_module_link:hover, a.remove_module_link:hover {
     width: 100% !important;
 }
 
+.editor_in_place iframe{
+    height: 382px !important;
+}
+
 .placeholder_holder{
     margin-top: 15px;
 }
@@ -2025,7 +2083,7 @@ label.bold-label{
     display: block;
     float: left;
     clear: right;
-    
+
 }
 
 .course-section div.wide.narrow .instructors-info {
@@ -2838,4 +2896,14 @@ label.minimum_grade_required_label{
     font-size: 12px;
     font-weight: normal;
     margin-bottom: 15px;
+}
+
+.editor_in_place textarea{
+    width: 100%;
+    margin: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    height: 382px;
+    border: 0;
+    outline: 0;
 }
