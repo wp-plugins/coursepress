@@ -749,6 +749,7 @@ object {
 .site-main [class*="navigation"] {
     margin: 20px 0 1.5em;
     overflow: hidden;
+    float: right;
 }
 
 .site-main [class*="navigation"] ul {
@@ -2034,6 +2035,10 @@ label.full{
 
 a[rel="prev"] {
     float: left;
+}
+
+.nav-links a[rel="next"]{
+    margin-left: 20px;
 }
 
 /* VIDEO MODULE */

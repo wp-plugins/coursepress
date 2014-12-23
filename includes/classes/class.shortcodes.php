@@ -1332,7 +1332,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 				$button = '<button data-link="' . esc_url( $button_url ) . '" class="apply-button apply-button-details ' . esc_attr( $class ) . '">' . esc_html( $details_text ) . '</button>';
 			} else {
 				//$button = apply_filters( 'coursepress_enroll_button_content', '', $course );
-				if( empty( $button_option ) || 'manually' == $course->enroll_type ) {
+				if( empty( $button_option ) || ( 'manually' == $course->enroll_type && ! ( 'access' == $button_option || 'continue' == $button_option ) ) ) {
 					return apply_filters( 'coursepress_enroll_button', $button, $course, $student );
 				}
 
@@ -3813,6 +3813,9 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 													$email_args[ 'student_email' ]		 = $student_data[ 'user_email' ];
 													$email_args[ 'student_first_name' ]	 = $student_data[ 'first_name' ];
 													$email_args[ 'student_last_name' ]	 = $student_data[ 'last_name' ];
+													$email_args[ 'student_username' ]	 = $student_data[ 'user_login' ];
+													$email_args[ 'student_password' ]	 = $student_data[ 'user_pass' ];
+													
 													coursepress_send_email( $email_args );
 
 													$creds						 = array();

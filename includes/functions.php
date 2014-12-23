@@ -13,15 +13,44 @@
   return $url;
   } */
 
+/* get_user_option() fix */
+
+function cp_admin_ajax_url() {
+  $scheme = ( is_ssl() || force_ssl_admin() ? 'https' : 'http' );
+  return admin_url( "admin-ajax.php", $scheme );
+}
+
+function cp_get_user_option( $option, $user_id = false ) {
+	global $wpdb;
+
+	$blog_id = get_current_blog_id();
+
+	if( empty( $user_id ) ) {
+		$user_id = get_current_user_id();
+	}
+
+	if( is_multisite() ) {
+
+		if( defined( 'BLOG_ID_CURRENT_SITE') && BLOG_ID_CURRENT_SITE == $blog_id ) {
+			return get_user_meta( $user_id, $wpdb->base_prefix . $option, true );
+		}
+
+		return get_user_meta( $user_id, $wpdb->prefix . $option, true );
+	} else {
+		return get_user_option( $option, $user_id );
+	}
+}
+
+
 function cp_unit_uses_new_pagination( $unit_id = false ) {
 	$unit_pagination_meta	 = get_post_meta( $unit_id, 'unit_pagination', true );
 	$unit_pagination		 = isset( $unit_pagination_meta ) && !empty( $unit_pagination_meta ) && $unit_pagination_meta !== false ? true : false;
 	return $unit_pagination;
 }
 
-function cp_get_id_by_post_name( $post_name ) {
+function cp_get_id_by_post_name( $post_name, $post_parent = 0, $type = 'unit' ) {
 	global $wpdb;
-	$id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name = '%s'", $post_name ) );
+	$id = $wpdb->get_var( $wpdb->prepare( "SELECT ID FROM $wpdb->posts WHERE post_name = '%s' AND post_type='%s' AND post_parent=%d", $post_name, $type, $post_parent ) );
 	return $id;
 }
 
@@ -473,8 +502,8 @@ function coursepress_send_email( $email_args = array() ) {
 		$subject		 = coursepress_get_registration_email_subject();
 		$courses_address = trailingslashit( home_url() ) . trailingslashit( $course_slug );
 
-		$tags			 = array( 'STUDENT_FIRST_NAME', 'STUDENT_LAST_NAME', 'BLOG_NAME', 'LOGIN_ADDRESS', 'COURSES_ADDRESS', 'WEBSITE_ADDRESS' );
-		$tags_replaces	 = array( $email_args[ 'student_first_name' ], $email_args[ 'student_last_name' ], get_bloginfo(), wp_login_url(), $courses_address, home_url() );
+		$tags			 = array( 'STUDENT_FIRST_NAME', 'STUDENT_LAST_NAME', 'STUDENT_USERNAME', 'STUDENT_PASSWORD', 'BLOG_NAME', 'LOGIN_ADDRESS', 'COURSES_ADDRESS', 'WEBSITE_ADDRESS' );
+		$tags_replaces	 = array( $email_args[ 'student_first_name' ], $email_args[ 'student_last_name' ], $email_args[ 'student_username' ], $email_args[ 'student_password' ], get_bloginfo(), wp_login_url(), $courses_address, home_url() );
 
 		$message = coursepress_get_registration_content_email();
 

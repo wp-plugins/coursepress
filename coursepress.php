@@ -6,7 +6,7 @@
   Author: WPMU DEV
   Author URI: http://premium.wpmudev.org
   Developers: Marko Miljus ( https://twitter.com/markomiljus ), Rheinard Korf ( https://twitter.com/rheinardkorf )
-  Version: 1.2.3.4
+  Version: 1.2.3.5
   TextDomain: cp
   Domain Path: /languages/
   WDP ID: 913071
@@ -64,7 +64,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $version = '1.2.3.4';
+		public $version = '1.2.3.5';
 
 		/**
 		 * Plugin friendly name.
@@ -727,6 +727,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 			 * @since 1.0.0
 			 */
 			//add_action( 'admin_enqueue_scripts', array( &$this, 'add_jquery_ui' ) );
+
+			add_action( 'admin_enqueue_scripts', array( &$this, 'cp_jquery_admin' ), 0, 1 );
 
 			/**
 			 * Admin header actions.
@@ -1654,6 +1656,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 					$email_args[ 'student_email' ]		 = $student_data[ 'user_email' ];
 					$email_args[ 'student_first_name' ]	 = $student_data[ 'first_name' ];
 					$email_args[ 'student_last_name' ]	 = $student_data[ 'last_name' ];
+					$email_args[ 'student_username' ]		 = $student_data[ 'user_login' ];
+					$email_args[ 'student_password' ]	 = $student_data[ 'user_pass' ];
 
 					coursepress_send_email( $email_args );
 
@@ -1787,7 +1791,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 					update_user_option( $user_id, 'role_ins', 'instructor', $global_option );
 					CoursePress::instance()->assign_instructor_capabilities( $user_id );
 				} else {
-					delete_user_option( $user_id, 'role_ins', 'instructor', $global_option );
+					delete_user_option( $user_id, 'role_ins', $global_option );
 					// Legacy
 					delete_user_meta( $user_id, 'role_ins', 'instructor' );
 					CoursePress::instance()->drop_instructor_capabilities( $user_id );
@@ -1796,12 +1800,21 @@ if ( !class_exists( 'CoursePress' ) ) {
 		}
 
 		function instructor_extra_profile_fields( $user ) {
+
 			if ( current_user_can( 'manage_options' ) ) {
 				?>
 				<h3><?php _e( 'Instructor Capabilities', 'cp' ); ?></h3>
 
 				<?php
-				$has_instructor_role = get_user_option( 'role_ins', $user->ID );
+				// If user has no role i.e. can't "read", don't even go near capabilities, it wont work.
+				if ( !user_can( $user, 'read' ) ) {
+					_e( "Can't assign instructor capabilities. User has no assigned role on this blog. See 'Role' above.", 'cp' );
+					return false;
+				}
+				?>
+
+				<?php
+				$has_instructor_role = 'instructor' == cp_get_user_option( 'role_ins', $user->ID ) ? true : false;
 				?>
 				<table class="form-table">
 					<tr>
@@ -2532,7 +2545,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				$unit	 = new Unit();
 
 				$vars[ 'course_id' ] = Course::get_course_id_by_name( $wp->query_vars[ 'coursename' ] );
-				$vars[ 'unit_id' ]	 = $unit->get_unit_id_by_name( $wp->query_vars[ 'unitname' ] );
+				$vars[ 'unit_id' ]	 = $unit->get_unit_id_by_name( $wp->query_vars[ 'unitname' ], $vars[ 'course_id' ] );
 
 				//$this->set_course_visited( get_current_user_id(), Course::get_course_id_by_name( $wp->query_vars['coursename'] ) );
 
@@ -2567,7 +2580,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 					if ( $theme_file != '' ) {
 						do_shortcode( '[course_unit_single unit_id="' . $vars[ 'unit_id' ] . '"]' ); //required for getting unit results
 						require_once( $theme_file );
-						exit;
+						//exit;
 					} else {
 						$args = array(
 							'slug'			 => $wp->request,
@@ -3517,8 +3530,10 @@ if ( !class_exists( 'CoursePress' ) ) {
 
 					wp_delete_object_term_relationships( $course_id, 'course_category' );
 
-					foreach ( $course_categories as $course_category ) {
-						wp_set_post_terms( $course_id, $course_category, 'course_category', true );
+					if ( !empty( $course_categories ) && is_array( $course_categories ) ) {
+						foreach ( $course_categories as $course_category ) {
+							wp_set_post_terms( $course_id, $course_category, 'course_category', true );
+						}
 					}
 				}
 
@@ -4269,7 +4284,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 			$role = new Instructor( $user_id );
 
 			$global_option = !is_multisite();
-			delete_user_option( $user_id, 'role_ins', 'instructor', $global_option );
+			delete_user_option( $user_id, 'role_ins', $global_option );
 			// Legacy
 			delete_user_meta( $user_id, 'role_ins', 'instructor' );
 
@@ -4397,7 +4412,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 			wp_enqueue_style( 'font_awesome', $this->plugin_url . 'css/font-awesome.css' );
 			wp_enqueue_script( 'enrollment_process', $this->plugin_url . 'js/front-enrollment-process.js', array( 'jquery' ), $this->version );
 			wp_localize_script( 'enrollment_process', 'cp_vars', array(
-				'admin_ajax_url'					 => admin_url( 'admin-ajax.php' ),
+				'admin_ajax_url'					 => cp_admin_ajax_url(),
 				'message_all_fields_are_required'	 => __( 'All fields are required.', 'cp' ),
 				'message_username_minimum_length'	 => __( 'Username must be at least 4 characters in length', 'cp' ),
 				'message_username_exists'			 => __( 'Username already exists or invalid. Please choose another one.', 'cp' ),
@@ -4410,7 +4425,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 				'message_passcode_invalid'			 => __( 'Passcode is not valid.', 'cp' ),
 				'message_tos_invalid'				 => __( 'You must agree to the Terms of Service in order to signup.', 'cp' ),
 			) );
-			//admin_url( 'admin-ajax.php' )
 
 			wp_enqueue_script( 'coursepress_front', $this->plugin_url . 'js/coursepress-front.js', array( 'jquery' ), $this->version );
 
@@ -4509,6 +4523,13 @@ if ( !class_exists( 'CoursePress' ) ) {
 			  wp_enqueue_script( 'jquery-ui-button' ); */
 		}
 
+		function cp_jquery_admin( $hook_sufix ) {
+			if ( strpos( $hook_sufix, 'course' ) !== false ) {
+				wp_enqueue_script( 'jquery' );
+				wp_enqueue_script( 'jquery-ui', '//code.jquery.com/ui/1.10.3/jquery-ui.js', array( 'jquery' ), '1.10.3' ); //need to change this to built-in
+			}
+		}
+
 		function admin_header_actions() {
 			global $pagenow;
 
@@ -4528,9 +4549,9 @@ if ( !class_exists( 'CoursePress' ) ) {
 			  wp_enqueue_script( 'jquery-ui-draggable' );
 			  wp_enqueue_script( 'jquery-ui-droppable' ); */
 			//add_action( 'wp_enqueue_scripts', array( &$this, 'add_jquery_ui' ) );
-			wp_enqueue_script( 'jquery' );
+			//wp_enqueue_script( 'jquery' );
 			//wp_enqueue_script( 'jquery-ui-core' );
-			wp_enqueue_script( 'jquery-ui', '//code.jquery.com/ui/1.10.3/jquery-ui.js', array( 'jquery' ), '1.10.3' ); //need to change this to built-in
+			//wp_enqueue_script( 'jquery-ui', '//code.jquery.com/ui/1.10.3/jquery-ui.js', array( 'jquery' ), '1.10.3' ); //need to change this to built-in
 			wp_enqueue_script( 'jquery-ui-spinner' );
 
 			// CryptoJS.MD5
@@ -4597,7 +4618,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 					'allowed_audio_extensions'				 => wp_get_audio_extensions(),
 					'allowed_image_extensions'				 => cp_wp_get_image_extensions(),
 					'start_of_week'							 => get_option( 'start_of_week', 0 ),
-					'unit_pagination'						 => $unit_pagination ? 1 : 0
+					'unit_pagination'						 => $unit_pagination ? 1 : 0,
+					'admin_ajax_url'						 => cp_admin_ajax_url(),
 				) );
 
 				do_action( 'coursepress_editor_options' );
@@ -4632,7 +4654,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 				'required_sale_price'			 => __( '<strong>Sale Price</strong> is a required field when "Enable Sale Price" is selected.', 'cp' ),
 				'section_error'					 => __( 'There is some information missing or incorrect. Please check your input and try again.', 'cp' ),
 				'cp_editor_style'				 => $this->plugin_url . 'css/editor_style_fix.css',
-				'unit_pagination'				 => $unit_pagination ? 1 : 0
+				'unit_pagination'				 => $unit_pagination ? 1 : 0,
+				'admin_ajax_url'				 => cp_admin_ajax_url(),
 			) );
 
 			wp_enqueue_style( 'jquery-ui-admin', $this->plugin_url . 'css/jquery-ui.css' );
@@ -4845,11 +4868,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		}
 
 		function check_for_get_actions() {
-
-			if ( isset( $_GET[ 'withdraw' ] ) && is_numeric( $_GET[ 'withdraw' ] ) ) {
-				$student = new Student( get_current_user_id() );
-				$student->withdraw_from_course( $_GET[ 'withdraw' ] );
-			}
+			
 		}
 
 		//shows a warning notice to admins if pretty permalinks are disabled
@@ -5101,7 +5120,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 							?>
 							<li class='menu-item-<?php echo $menu_item->ID; ?>'><a id="<?php echo $menu_item->ID; ?>"
 																				   href="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a>
-																				   <?php if ( $menu_item->db_id !== '' ) { ?>
+									<?php if ( $menu_item->db_id !== '' ) { ?>
 									<ul class="sub-menu dropdown-menu">
 										<?php
 										foreach ( $sub_sorted_menu_items as $menu_item ) {
@@ -5110,9 +5129,9 @@ if ( !class_exists( 'CoursePress' ) ) {
 													id="<?php echo $menu_item->ID; ?>"
 													href="<?php echo $menu_item->url; ?>"><?php echo $menu_item->title; ?></a>
 											</li>
-										<?php } ?>
+									<?php } ?>
 									</ul>
-								<?php } ?>
+							<?php } ?>
 							</li>
 							<?php
 						}
@@ -5214,7 +5233,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 									</li>
 								<?php } ?>
 							<?php } ?>
-						<?php } ?>
+				<?php } ?>
 					</ul>
 				</div>
 				<?php
@@ -5255,8 +5274,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 
 		function no_comments_template( $template ) {
 			global $post;
-
-			if ( 'virtual_page' == $post->post_type ) {
+			$post_types = array( 'virtual_page', 'course' );
+			if ( in_array( $post->post_type, $post_types ) ) {
 				$template = $this->plugin_dir . 'includes/templates/no-comments.php';
 			}
 

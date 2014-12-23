@@ -243,7 +243,7 @@ if ( !class_exists( 'Student' ) ) {
 			 * Setup actions for when a student enrolls.
 			 * Can be used to create notifications or tracking student actions.
 			 */
-			$instructors = Course::get_course_instructors_ids( $_GET[ 'course_id' ]);
+			$instructors = Course::get_course_instructors_ids( isset($_GET[ 'course_id' ]) ? $_GET[ 'course_id' ] : $course_id);
 			do_action('student_enrolled_instructor_notification', $this->ID, $course_id, $instructors);
 			do_action('student_enrolled_student_notification', $this->ID, $course_id);
 
@@ -267,7 +267,7 @@ if ( !class_exists( 'Student' ) ) {
 		 * @param bool $keep_withdrawed_record If true, the withdrawn date will be saved in user meta.
 		 */
 		function withdraw_from_course( $course_id, $keep_withdrawed_record = true ) {
-
+			
 			$current_time = current_time( 'mysql' );
 
 			$global_option = ! is_multisite();
