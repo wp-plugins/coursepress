@@ -80,6 +80,18 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.3.5 =
+
+* Added STUDENT_USERNAME and STUDENT_PASSWORD placeholder to the student registration email 
+* Fixed (potential) issue with student signup when FORCE_SSL_ADMIN is turned on
+* Fixed conflicts with Gravity Forms (admin and unit pages)
+* Fixed issue with multisite and granting and revoking instructor capabilities.
+* Fixed: Comments section no longer showing on course details page.
+* Fixed issue with 'Start Learning/Continue Learning' buttons not showing for courses set to manual enrollments.
+* Fixed: Instructor Capabilities On User Profile Page Not Saving When Granting/Revoking Capabilities
+* Fixed: coursepress_student_withdrawn hook is firing twice for a single withdrawal
+* Fixed issue with unique course and units slugs
+
 = 1.2.3.4 =
 
 * Added additional instructor capability for managing Course Categories
