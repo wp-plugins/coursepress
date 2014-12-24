@@ -323,7 +323,7 @@ jQuery( document ).ready( function( $ ) {
                     toolbar: coursepress_editor.toolbar.join( ',' ),
                     theme: coursepress_editor.theme,
                     skin: coursepress_editor.skin,
-                    menubar: false
+                    menubar: false,
                 } );
 
                 // Init Quicktags
@@ -605,7 +605,7 @@ function cp_repaint_current_page_editors() {
             toolbar: coursepress_editor.toolbar.join( ',' ),
             theme: coursepress_editor.theme,
             skin: coursepress_editor.skin,
-            menubar: false
+            menubar: false,
         } );
 
         // Init Quicktags
@@ -669,7 +669,7 @@ function cp_repaint_all_editors() {
             toolbar: coursepress_editor.toolbar.join( ',' ),
             theme: coursepress_editor.theme,
             skin: coursepress_editor.skin,
-            menubar: false
+            menubar: false,
         } );
 
         // Init Quicktags
@@ -1126,7 +1126,7 @@ jQuery( document ).ready( function() {
         tinyMCE.init( {
 // General options
             mode: "specific_textareas",
-            editor_selector: "mceEditor"
+            editor_selector: "mceEditor",
         } );
         //tinyMCE.setActive( id, true );
     }
@@ -1228,9 +1228,7 @@ jQuery( document ).ready( function() {
         var iframe_id = jQuery( holder ).find( 'iframe' ).attr( 'id' );
         var iframe_content = document.getElementById( iframe_id ).contentWindow.document.body.innerHTML;
         global_iframe_content = iframe_content;
-        console.log( global_iframe_content );
-        //alert(global_iframe_content);
-        //alert(iframe_content);
+        //console.log( global_iframe_content );
     } );
 
     jQuery( '.modules_accordion' ).accordion( {
@@ -1295,7 +1293,7 @@ jQuery( document ).ready( function() {
                 toolbar: coursepress_editor.toolbar.join( ',' ),
                 theme: coursepress_editor.theme,
                 skin: coursepress_editor.skin,
-                menubar: false
+                menubar: false,
             } );
 
             //tinyMCE.EditorManager.execCommand( 'mceFocus', false, rand_id );

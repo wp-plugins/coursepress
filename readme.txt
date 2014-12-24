@@ -80,6 +80,12 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.3.6 =
+
+* Fixed: Date translations now work properly.
+* Fixed issue with extra content on the unit page singe page
+* Fixed Gravity Forms form submission and redirection on the unit pages
+
 = 1.2.3.5 =
 
 * Added STUDENT_USERNAME and STUDENT_PASSWORD placeholder to the student registration email 
