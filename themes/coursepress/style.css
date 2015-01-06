@@ -49,6 +49,27 @@ html, body{
     height: 100%;
 }
 
+.clearfix:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+}
+
+.clearfix {
+    display: inline-block;
+}
+
+html[xmlns] .clearfix {
+    display: block;
+}
+
+* html .clearfix {
+    height: 1%;
+}
+
 #page{
     min-height: 100%;
     height: auto !important;
@@ -749,7 +770,6 @@ object {
 .site-main [class*="navigation"] {
     margin: 20px 0 1.5em;
     overflow: hidden;
-    float: right;
 }
 
 .site-main [class*="navigation"] ul {
@@ -1829,6 +1849,18 @@ li.submenu-item a{
     display: block;
 }
 
+li.submenu-inbox a{
+    color: #808080;
+}
+
+li.submenu-sent-messages a{
+    color: #808080;
+}
+
+li.submenu-new-message a{
+    color: #808080;
+}
+
 li.submenu-units a{
     background: url( 'images/icon-units.svg' );
     background-repeat: no-repeat;
@@ -2035,10 +2067,6 @@ label.full{
 
 a[rel="prev"] {
     float: left;
-}
-
-.nav-links a[rel="next"]{
-    margin-left: 20px;
 }
 
 /* VIDEO MODULE */
