@@ -72,7 +72,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $name = 'CoursePress Pro';
+		public $name = 'CoursePress';
 
 		/**
 		 * Plugin directory name.
