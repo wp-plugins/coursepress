@@ -2,11 +2,11 @@
 /*
   Plugin Name: CoursePress
   Plugin URI: http://premium.wpmudev.org/project/coursepress/
-  Description: CoursePress turns WordPress into a powerful online learning platform. Set up online courses by creating learning units with quiz elements, video, audio etc. You can also assess student work, sell your courses and much much more.
+  Description: CoursePress Pro turns WordPress into a powerful online learning platform. Set up online courses by creating learning units with quiz elements, video, audio etc. You can also assess student work, sell your courses and much much more.
   Author: WPMU DEV
   Author URI: http://premium.wpmudev.org
   Developers: Marko Miljus ( https://twitter.com/markomiljus ), Rheinard Korf ( https://twitter.com/rheinardkorf )
-  Version: 1.2.3.8
+  Version: 1.2.3.9
   TextDomain: cp
   Domain Path: /languages/
   WDP ID: 913071
@@ -64,7 +64,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $version = '1.2.3.8';
+		public $version = '1.2.3.9';
 
 		/**
 		 * Plugin friendly name.
@@ -72,7 +72,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $name = 'CoursePress';
+		public $name = 'CoursePress Pro';
 
 		/**
 		 * Plugin directory name.
@@ -207,7 +207,9 @@ if ( !class_exists( 'CoursePress' ) ) {
 			}
 
 			// Define custom theme directory for CoursePress theme
-			$this->register_theme_directory();
+			if ( !CoursePress_Capabilities::is_campus() ) {
+				$this->register_theme_directory();
+			}
 
 			// Install Plugin
 			register_activation_hook( __FILE__, array( $this, 'install' ) );
