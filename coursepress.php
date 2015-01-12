@@ -2,11 +2,11 @@
 /*
   Plugin Name: CoursePress
   Plugin URI: http://premium.wpmudev.org/project/coursepress/
-  Description: CoursePress Pro turns WordPress into a powerful online learning platform. Set up online courses by creating learning units with quiz elements, video, audio etc. You can also assess student work, sell your courses and much much more.
+  Description: CoursePress turns WordPress into a powerful online learning platform. Set up online courses by creating learning units with quiz elements, video, audio etc. You can also assess student work, sell your courses and much much more.
   Author: WPMU DEV
   Author URI: http://premium.wpmudev.org
   Developers: Marko Miljus ( https://twitter.com/markomiljus ), Rheinard Korf ( https://twitter.com/rheinardkorf )
-  Version: 1.2.3.9
+  Version: 1.2.4
   TextDomain: cp
   Domain Path: /languages/
   WDP ID: 913071
@@ -64,7 +64,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $version = '1.2.3.9';
+		public $version = '1.2.4';
 
 		/**
 		 * Plugin friendly name.
@@ -1966,8 +1966,8 @@ if ( !class_exists( 'CoursePress' ) ) {
 				$student	 = new Student( get_current_user_id() );
 				$instructor	 = new Instructor( get_current_user_id() );
 				$has_access	 = false;
-
-				if ( current_user_can( 'manage_options' ) || $student->has_access_to_course( $course_id ) || $instructor->is_assigned_to_course( get_current_user_id(), $course_id ) ) {
+				
+				if ( current_user_can( 'manage_options' ) || $student->has_access_to_course( $course_id ) || $instructor->is_assigned_to_course( $course_id, get_current_user_id() ) ) {
 					$has_access = true;
 				}
 
@@ -4733,6 +4733,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 					'delete_instructor_alert'				 => __( 'Please confirm that you want to remove the instructor from this course?', 'cp' ),
 					'delete_pending_instructor_alert'		 => __( 'Please confirm that you want to cancel the invite. Instuctor will receive a warning when trying to activate.', 'cp' ),
 					'delete_course_alert'					 => __( 'Please confirm that you want to permanently delete the course, its units, unit elements and responses?', 'cp' ),
+					'delete_student_response_alert'					 => __( 'Please confirm that you want to permanently delete this student answer / reponse?', 'cp' ),
 					'delete_notification_alert'				 => __( 'Please confirm that you want to permanently delete the notification?', 'cp' ),
 					'delete_discussion_alert'				 => __( 'Please confirm that you want to permanently delete the discussion?', 'cp' ),
 					'withdraw_student_alert'				 => __( 'Please confirm that you want to withdraw student from this course. If you withdraw, you will no longer be able to see student\'s records for this course.', 'cp' ),

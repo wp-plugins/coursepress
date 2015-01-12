@@ -3023,6 +3023,10 @@ RESPONSIVE
 
 @media screen and ( max-width: 790px ) {
 
+    .post-type-archive-course .video_player{
+        display: none;
+    }
+
     #drop-mobile-nav{
         display: block;
         float: right;
@@ -3047,13 +3051,10 @@ RESPONSIVE
     }
 
 
-}
-
-@media screen and ( max-width: 750px ) {
-
     .course-video{
         width: 100%;
     }
+
     .entry-content-excerpt{
         float: right;
         width: 100%;
@@ -3087,8 +3088,6 @@ RESPONSIVE
         left: 0px;
         padding-left: 3%
     }
-
-
 
     .post-type-archive-course article.type-course h1,
     .post-type-archive-course article.type-course .entry-content p,
