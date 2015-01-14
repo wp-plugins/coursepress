@@ -6,7 +6,7 @@
   Author: WPMU DEV
   Author URI: http://premium.wpmudev.org
   Developers: Marko Miljus ( https://twitter.com/markomiljus ), Rheinard Korf ( https://twitter.com/rheinardkorf )
-  Version: 1.2.4
+  Version: 1.2.4.2
   TextDomain: cp
   Domain Path: /languages/
   WDP ID: 913071
@@ -47,7 +47,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 	 */
 	class CoursePress {
 
-		public $mp_file = '198613_marketpress-ecommerce-2.9.5.9.zip';
+		public $mp_file = '198613_marketpress-ecommerce-2.9.6.zip';
 
 		/**
 		 * Current running instance of CoursePress.
@@ -64,7 +64,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 		 * @since 1.0.0
 		 * @var string
 		 */
-		public $version = '1.2.4';
+		public $version = '1.2.4.2';
 
 		/**
 		 * Plugin friendly name.
@@ -1966,7 +1966,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 				$student	 = new Student( get_current_user_id() );
 				$instructor	 = new Instructor( get_current_user_id() );
 				$has_access	 = false;
-				
+
 				if ( current_user_can( 'manage_options' ) || $student->has_access_to_course( $course_id ) || $instructor->is_assigned_to_course( $course_id, get_current_user_id() ) ) {
 					$has_access = true;
 				}
@@ -4596,6 +4596,9 @@ if ( !class_exists( 'CoursePress' ) ) {
 					}
 				}
 			}
+
+				// Responsive Video
+				//wp_enqueue_script( 'responsive-video', $this->plugin_url . 'js/responsive-video.js' );
 		}
 
 		function return_empty() {
@@ -4691,9 +4694,6 @@ if ( !class_exists( 'CoursePress' ) ) {
 			// CryptoJS.MD5
 			wp_enqueue_script( 'cryptojs-md5', $this->plugin_url . 'js/md5.js' );
 
-			// Responsive Video
-			wp_enqueue_script( 'responsive-video', $this->plugin_url . 'js/responsive-video.js' );
-
 
 			if ( isset( $_GET[ 'page' ] ) ) {
 				$page = isset( $_GET[ 'page' ] );
@@ -4733,7 +4733,7 @@ if ( !class_exists( 'CoursePress' ) ) {
 					'delete_instructor_alert'				 => __( 'Please confirm that you want to remove the instructor from this course?', 'cp' ),
 					'delete_pending_instructor_alert'		 => __( 'Please confirm that you want to cancel the invite. Instuctor will receive a warning when trying to activate.', 'cp' ),
 					'delete_course_alert'					 => __( 'Please confirm that you want to permanently delete the course, its units, unit elements and responses?', 'cp' ),
-					'delete_student_response_alert'					 => __( 'Please confirm that you want to permanently delete this student answer / reponse?', 'cp' ),
+					'delete_student_response_alert'			 => __( 'Please confirm that you want to permanently delete this student answer / reponse?', 'cp' ),
 					'delete_notification_alert'				 => __( 'Please confirm that you want to permanently delete the notification?', 'cp' ),
 					'delete_discussion_alert'				 => __( 'Please confirm that you want to permanently delete the discussion?', 'cp' ),
 					'withdraw_student_alert'				 => __( 'Please confirm that you want to withdraw student from this course. If you withdraw, you will no longer be able to see student\'s records for this course.', 'cp' ),

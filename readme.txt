@@ -80,6 +80,16 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.4.2 =
+* Updated MarketPress to 2.9.6
+* Added Unit HTML editor back (for Mac)
+* Fixed bug with unit editor (double editor on switch)
+
+= 1.2.4.1 =
+* Updated course structure (admin and front) to reflect recent changes in the units builder logic
+* Fixed issue with Jatpack's CSS editor
+* Added additional filters for developers in shortcodes
+
 = 1.2.4 =
 * Added option for deleting student answers / responses
 * Added option for instructor to access units and other course inner pages without need to enroll into course

@@ -14,6 +14,12 @@
   } */
 
 /* get_user_option() fix */
+function is_mac() {
+	$user_agent = getenv( "HTTP_USER_AGENT" );
+	if ( strpos( $user_agent, "Mac" ) !== FALSE ) {
+		return true;
+	}
+}
 
 function cp_messaging_get_unread_messages_count() {
 	global $wpdb, $user_ID;
