@@ -80,6 +80,9 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.4.4 =
+* Resolved issue with unit element content saving / removed unit HTML editor
+
 = 1.2.4.2 =
 * Updated MarketPress to 2.9.6
 * Added Unit HTML editor back (for Mac)
