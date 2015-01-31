@@ -80,7 +80,7 @@ get_header();
 				}
 			} else {
 				?>
-				<h1 class="zero-course-units"><?php _e( "0 units in the course currently. Please check back later." ); ?></h1>
+				<h1 class="zero-course-units"><?php _e( "0 units in the course currently. Please check back later.", 'cp' ); ?></h1>
 				<?php
 			}
 			wp_reset_postdata();

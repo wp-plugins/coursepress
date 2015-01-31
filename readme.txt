@@ -80,6 +80,12 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.4.5 =
+* Fixes issue with marking an order as paid with MarketPress
+* Fixed text domain issues with the CoursePress theme
+* Fixes issue with the LOGIN_ADDRESS email tag and its URL
+* Fixed jQuery issues on the front-end caused by "live" function
+
 = 1.2.4.4 =
 * Resolved issue with unit element content saving / removed unit HTML editor
 
