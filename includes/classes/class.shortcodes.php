@@ -2702,6 +2702,7 @@ if ( !class_exists( 'CoursePress_Shortcodes' ) ) {
 					<?php
 					$show_link = CP_Basic_Certificate::option( 'basic_certificate_enabled' );
 					$show_link = ! empty( $show_link ) ? true : false;
+					$show_link = CoursePress_Capabilities::is_pro() ? $show_link : false;
 					if( is_user_logged_in() && $show_link ) {
 
 						if ( Student_Completion::is_course_complete( get_current_user_id(), $course_id ) ) {
