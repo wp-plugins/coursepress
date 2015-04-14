@@ -78,8 +78,8 @@ jQuery( document ).ready( function( $ ) {
     }
 
     jQuery( ".unit-control-buttons .save-unit-button" ).click( function() {
-        $('.wp-switch-editor.switch-tmce').click();
-        
+        $( '.wp-switch-editor.switch-tmce' ).click();
+
         var unit_page_num = jQuery( '#unit-pages .ui-tabs-nav .ui-state-active a' ).html();
         jQuery( "#unit_page_num" ).val( unit_page_num );
 
@@ -923,6 +923,7 @@ function validateCourseFields( step, ignore ) {
         case '6':
 
             var has_gateway = $( $( '.step-6 .course-enable-gateways' )[0] ).hasClass( 'gateway-active' );
+            
             if ( $( '[name=meta_enroll_type]' ).val() == 'passcode' ) {
                 if ( $( '[name=meta_passcode]' ).val() == "" ) {
                     $( '[for=meta_enroll_type]' ).parent().append( '<span class="error">' + coursepress_units.required_course_passcode + '</span>' );
@@ -1664,7 +1665,7 @@ jQuery( document ).ready( function( $ ) {
 
 
     $( '.unit-control-buttons .button-preview' ).click( function( event ) {
-        $('.wp-switch-editor.switch-tmce').click();
+        $( '.wp-switch-editor.switch-tmce' ).click();
         event.preventDefault();
         $( '#unit-add' ).append( '<input type="hidden" name="preview_redirect_url" id="preview_redirect_url" value="yes" />' );
         $( '#unit-add' ).attr( 'target', '_blank' );
@@ -1913,6 +1914,14 @@ jQuery( document ).ready( function( $ ) {
         }
     } );
 
+    /* Hide related media */
+    $( '[name*="hide_related_media"]' ).live( "change", function( event ) {
+        if ( $( this ).attr( 'checked' ) ) {
+            $( this ).siblings( '[name*="hide_related_media_field"]' ).val( 'yes' );
+        } else {
+            $( this ).siblings( '[name*="hide_related_media_field"]' ).val( 'no' );
+        }
+    } );
 
     /* Set hidden title field. Resolves issue with $_POST arrays. */
     $( '[name*="show_title_on_front"]' ).live( "change", function( event ) {
@@ -1962,9 +1971,9 @@ jQuery( document ).ready( function( $ ) {
     function slim_scroll_load() {
 
         var scroll_height = 750;
-        
+
         //if($(window).height() <= 750){
-            scroll_height = $(window).height() - 120;
+        scroll_height = $( window ).height() - 120;
         //}
 
         $( '#sortable-units' ).slimScroll( {

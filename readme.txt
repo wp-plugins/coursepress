@@ -80,6 +80,70 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.5.2 =
+* Fix missing class error for CoursePress Standard.
+
+= 1.2.5.1 =
+* Added basic certificate functionality to CoursePress Pro (templates planned for future release).
+* Added additional capabilities for instructors
+* Added formatting to the instructor single page
+* Changed default 'subscriber' role for students to be actual default WordPress role set
+* Fixed issue with enrolling a student to a paid course (paid via PayPal chained payments)
+* Fixed issue with mandatory, assessable and limit attempts options (if once checked then unchecked)
+* Fixed issue with uncompleted course even if unit elements (answer fields) were completed
+* Fixed issue: Course Pre-Requisite still showing after required course completed
+* Fixed theme translation issues
+* Fixed issue with instructor profile pages when instructor username contains space
+* Fixed issue with Course Structure links when course starts in the future
+* Fixed "unit_page_title_tag_class" shortcode attribute to output valid HTML class
+* Fixed issues with courses bulk actions
+* Fixed issue with previewing a unit (when user needs to pass all mandatory assessments option is checked)
+* Fixed issue with Order Complete Page MarketPress message
+* Fixed issue with displaying 1970 date on the course calendar when clicking on the previous link
+* Fixed issue with course order when Post Order Number is selected as an course order option
+* Fixed issue with login and signup popup links
+* Fixed issue with admin discussions pagination
+* Fixed instructors courses list properly with pagination (10 courses+)
+* Removed ping backs from courses (implementation on the feature request list).
+* Fixed conflicts with BuddyPress Groups.
+* Fixed issue with loading CoursePress styles on other admin pages.
+* Fixed issue with broken file downloads in Units (sites using PHP 5.6+).
+* Fixed issue where non-embeddable videos (e.g. some YouTube videos) shows nothing. Now it will show a clickable link.
+* Added ability to hide related videos for YouTube videos.
+* Fixed RTL issue causing horizontal scroll bug on Course Overview page.
+* Fixed 0's showing up on CoursePress pages when Poll Voting Plugin is installed.
+* Fixed new units automatically added to structure where it was not before.
+* Fixed showing featured images in CoursePress theme.
+* Fixed issue with paid courses not always enrolling when using MarketPress.
+* Fixed issue with instructor marked mandatory results not calculating course completion correctly.
+* Fixed broken 'Recent Posts' widget when viewing any CoursePress page.
+
+= 1.2.5 =
+* Added additional hooks and filters for developers
+
+= 1.2.4.9 =
+* Fixed: Auto correcting previous student responses for Single- and Multiple Choice questions without needing to re-submit answers.
+* This release improves the changes made in version 1.2.4.8.
+
+= 1.2.4.8 =
+* Fixed potential issue when using quotation marks or special characters in Single- and Multiple Choice questions.
+* Fixes auto-grading of questions and mandatory questions reporting. (Note: Students may need to resubmit some responses)
+
+= 1.2.4.7 =
+* Recommended performance update. Significant improvements made (e.g. From 17s down to 0.56s using high volume test sample.)
+* Progress tracking changed from course focused to student focused reducing database queries. Pages might load a fraction slower (up to 1s in testing) the first time old students accesses a course.
+* Shortcode performance improvements
+* Removing redundant CoursePress metadata from database
+* Fixing unit layout issues resulting in HTML being displayed on the screen.
+
+= 1.2.4.6 =
+* Performance: When persistent object caching (server setup or 3rd party) is not available CoursePress will fall back to using transients to speed up page loads.
+* Fixed: [course_join_button] now works properly on pages (bug caused it only to work on posts).
+* Changed: [course_thumbnail] deprecated. Will revert to preferred [course_media type="thumbnail"] using the proper Course List image as thumbnail.
+* Fixed: Required fields error for enrolment popup.
+* Fixed: 'Start Learning Now' button in enrolment popup.
+* Fixed: Added missing translations.
+
 = 1.2.4.5 =
 * Fixes issue with marking an order as paid with MarketPress
 * Fixed text domain issues with the CoursePress theme
