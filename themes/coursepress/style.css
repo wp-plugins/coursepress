@@ -49,27 +49,6 @@ html, body{
     height: 100%;
 }
 
-.clearfix:after {
-    content: ".";
-    display: block;
-    clear: both;
-    visibility: hidden;
-    line-height: 0;
-    height: 0;
-}
-
-.clearfix {
-    display: inline-block;
-}
-
-html[xmlns] .clearfix {
-    display: block;
-}
-
-* html .clearfix {
-    height: 1%;
-}
-
 #page{
     min-height: 100%;
     height: auto !important;
@@ -1849,18 +1828,6 @@ li.submenu-item a{
     display: block;
 }
 
-li.submenu-inbox a{
-    color: #808080;
-}
-
-li.submenu-sent-messages a{
-    color: #808080;
-}
-
-li.submenu-new-message a{
-    color: #808080;
-}
-
 li.submenu-units a{
     background: url( 'images/icon-units.svg' );
     background-repeat: no-repeat;
@@ -1909,10 +1876,21 @@ li.submenu-workbook a{
     color: #808080;
 }
 
+li.submenu-certificate a{
+    background: url( 'images/icon-certificate.svg' );
+    background-repeat: no-repeat;
+    background-position: left center;
+    padding-left: 25px;
+    color: #808080;
+}
+
 li.submenu-active{
     /*background-color: #f3f6f8;  */ 
 }
 
+.units-archive-list {
+    clear: both;
+}
 .units-archive-list li{
     background-color: #f3f6f8;
     display: block;
@@ -3023,10 +3001,6 @@ RESPONSIVE
 
 @media screen and ( max-width: 790px ) {
 
-    .post-type-archive-course .video_player{
-        display: none;
-    }
-
     #drop-mobile-nav{
         display: block;
         float: right;
@@ -3051,10 +3025,13 @@ RESPONSIVE
     }
 
 
+}
+
+@media screen and ( max-width: 750px ) {
+
     .course-video{
         width: 100%;
     }
-
     .entry-content-excerpt{
         float: right;
         width: 100%;
@@ -3088,6 +3065,8 @@ RESPONSIVE
         left: 0px;
         padding-left: 3%
     }
+
+
 
     .post-type-archive-course article.type-course h1,
     .post-type-archive-course article.type-course .entry-content p,

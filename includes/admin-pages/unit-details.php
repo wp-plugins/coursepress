@@ -21,6 +21,7 @@ if ( !isset( $_POST[ 'force_current_unit_successful_completion' ] ) ) {
 	$_POST[ 'force_current_unit_successful_completion' ] = 'off';
 }
 
+Unit_Module::check_for_modules_to_delete();
 
 if ( isset( $_GET[ 'unit_id' ] ) ) {
 	$unit_id									 = (int) $_GET[ 'unit_id' ];
@@ -307,8 +308,6 @@ $preview_redirect	 = isset( $_REQUEST[ 'preview_redirect' ] ) ? $_REQUEST[ 'prev
 
 								$save_elements = true;
 
-								$module = new Unit_Module();
-
 								$show_title = get_post_meta( $unit_id, 'show_page_title', true );
 
 								for ( $i = 1; $i <= $unit_pages; $i++ ) {
@@ -396,7 +395,7 @@ $preview_redirect	 = isset( $_REQUEST[ 'preview_redirect' ] ) ? $_REQUEST[ 'prev
 											$unit_id		 = ($unit_id == 0 ? -1 : $unit_id);
 
 											if ( $unit_pagination ) {
-												$modules	 = $module->get_modules( $unit_id, $i );
+												$modules	 = Unit_Module::get_modules( $unit_id, $i );
 												$pages_num	 = 1;
 												foreach ( $modules as $mod ) {
 													$class_name = $mod->module_type;
@@ -406,7 +405,7 @@ $preview_redirect	 = isset( $_REQUEST[ 'preview_redirect' ] ) ? $_REQUEST[ 'prev
 													}
 												}
 											} else {
-												$modules	 = $module->get_modules( $unit_id, 0 );
+												$modules	 = Unit_Module::get_modules( $unit_id, 0 );
 												$pages_num	 = 1;
 												foreach ( $modules as $mod ) {
 													$class_name = $mod->module_type;

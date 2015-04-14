@@ -20,7 +20,7 @@
  * MA 02110-1301 USA
  *
  */
-if ( !class_exists( 'CoursePress_Integration' ) ) {
+if ( ! class_exists( 'CoursePress_Integration' ) ) {
 
 	/**
 	 * CoursePress class for integrating with other plugins
@@ -37,6 +37,9 @@ if ( !class_exists( 'CoursePress_Integration' ) ) {
 			// Ultimate Facebook (2.7.8+)
 			add_action( 'wp_head', array( &$this, 'wp_head_ufb_integration' ) );
 
+			// Post Voting Plugin (2.2.2+)
+			add_filter( 'automatically_inject_voting_buttons', array( &$this, 'disable_post_voting_buttons' ) );
+
 			// Initialise TinCan Integration
 			//new CoursePress_TinCan();
 
@@ -52,7 +55,7 @@ if ( !class_exists( 'CoursePress_Integration' ) ) {
 		 * @since 1.2.2
 		 */
 		function wp_head_ufb_integration() {
-			if( 'course' == get_post_type() ) {
+			if ( 'course' == get_post_type() ) {
 				$this->data['current_course'] = new Course( get_the_ID() ); // course already in object cache
 				add_filter( 'wdfb-opengraph_apply_the_content_filter', array( &$this, 'ufb_remove_content_filter' ) );
 				add_filter( 'wdfb-opengraph-image', array( &$this, 'ufb_opengraph_image' ) );
@@ -112,15 +115,44 @@ if ( !class_exists( 'CoursePress_Integration' ) ) {
 		 */
 		function ufb_opengraph_property( $meta, $name, $value ) {
 
-			if( 'og:description' == $name ) {
+			if ( 'og:description' == $name ) {
 				$value = $this->data['current_course']->details->post_excerpt;
-				$meta = '<meta content="' . esc_html( $value ) . '" property="og:description">';
+				$meta  = '<meta content="' . esc_html( $value ) . '" property="og:description">';
 			}
 
 			return $meta;
 		}
 
 		/* ----- [END] ULTIMATE FACEBOOK ----- */
+
+		/* ----- POST VOTING PLUGIN ---- */
+
+		function disable_post_voting_buttons( $inject ) {
+
+			global $post;
+
+			$ignore_types = array( 'course', 'unit', 'virtual_page', 'discussions', 'module', 'certificates', 'notifications', 'module_response' );
+
+			if( ! empty( $post ) && isset( $post->post_type ) && in_array( $post->post_type, $ignore_types) ) {
+				return false;
+			}
+
+			$coursepress_slugs = array(
+				CoursePress::instance()->get_enrollment_process_slug(),
+				CoursePress::instance()->get_login_slug(),
+				CoursePress::instance()->get_signup_slug(),
+				CoursePress::instance()->get_student_dashboard_slug(),
+				CoursePress::instance()->get_student_settings_slug(),
+			);
+
+			if( in_array( $post->post_name, $coursepress_slugs ) ) {
+				return false;
+			}
+
+			return $inject;
+		}
+
+		/* ----- [END POST VOTING PLUGIN ---- */
 
 	}
 

@@ -25,7 +25,8 @@ if ( isset( $_POST[ 'submit' ] ) && current_user_can( 'manage_options' ) ) {
 			foreach ( $user_capabilities as $key => $old_cap ) {
 				// Make sure to only remove CoursePress instructor capabilities
 				if ( !in_array( $key, $_POST[ 'instructor_capability' ] ) &&
-				in_array( $key, array_keys( CoursePress_Capabilities::$capabilities[ 'instructor' ] ) ) ) {//making the operation less expensive
+				in_array( $key, array_keys( CoursePress_Capabilities::$capabilities[ 'instructor' ] ) )
+				) {//making the operation less expensive
 					if ( !user_can( $user->ID, 'manage_options' ) ) {
 						$role->remove_cap( $key );
 					}
@@ -61,7 +62,8 @@ $capability_boxes = array(
 	'instructor_capabilities_students'			 => __( 'Students', 'cp' ),
 	'instructor_capabilities_notifications'		 => __( 'Notifications', 'cp' ),
 	'instructor_capabilities_discussions'		 => __( 'Discussions', 'cp' ),
- //'instructor_capabilities_groups' => __( 'Settings Pages', 'cp' ),
+	'instructor_capabilities_posts_and_pages'	 => __( 'Posts and Pages', 'cp' )
+//'instructor_capabilities_groups' => __( 'Settings Pages', 'cp' ),
 );
 
 $instructor_capabilities_general = array(
@@ -163,19 +165,28 @@ $instructor_capabilities_discussions = array(
 	'coursepress_delete_discussion_cap'				 => __( 'Delete every discussions', 'cp' ),
 	'coursepress_delete_my_discussion_cap'			 => __( 'Delete discussions made by the instructor only', 'cp' ),
 );
+
+$instructor_capabilities_posts_and_pages = array(
+	'edit_pages'			 => __( 'Edit Pages (required for MarketPress)', 'cp' ),
+	'edit_published_pages'	 => __( 'Edit Published Pages', 'cp' ),
+	'edit_posts'			 => __( 'Edit Posts', 'cp' ),
+	'publish_pages'			 => __( 'Publish Pages', 'cp' ),
+	'publish_posts'			 => __( 'Publish Posts', 'cp' )
+);
 ?>
 <div id="poststuff" class="metabox-holder m-settings cp-wrap">
-    <form action='' method='post'>
+	<form action='' method='post'>
 
 		<?php
 		wp_nonce_field( 'update-coursepress-options' );
 		?>
-        <p class='description'><?php printf( __( 'Instructor capabilities define what the Instructors can or cannot do within the %s.', 'cp' ), $this->name ); ?></p>
+		<p class='description'><?php printf( __( 'Instructor capabilities define what the Instructors can or cannot do within the %s.', 'cp' ), $this->name ); ?></p>
 		<?php
 		foreach ( $capability_boxes as $box_key => $group_name ) {
 			?>
 			<div class="postbox">
 				<h3 class="hndle" style='cursor:auto;'><span><?php echo $group_name; ?></span></h3>
+
 				<div class="inside">
 
 					<table class="form-table">
@@ -190,19 +201,20 @@ $instructor_capabilities_discussions = array(
 										if ( in_array( $key, $instructor_capabilities ) ) {
 											echo 'checked';
 										}
-										?> name="instructor_capability[]" value="<?php echo $key; ?>"></td>  
+										?> name="instructor_capability[]" value="<?php echo $key; ?>"></td>
 								</tr>
 							<?php } ?>
 						</tbody>
 					</table>
-				</div><!--/inside-->
+				</div>
+				<!--/inside-->
 
 			</div><!--/postbox-->
 		<?php } ?>
 
-        <p class="save-shanges">
+		<p class="save-shanges">
 			<?php submit_button( __( 'Save Changes', 'cp' ) ); ?>
-        </p>
+		</p>
 
-    </form>
+	</form>
 </div>

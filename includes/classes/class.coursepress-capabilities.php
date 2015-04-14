@@ -4,20 +4,20 @@
  * @copyright Incsub ( http://incsub.com/ )
  *
  * @license http://opensource.org/licenses/GPL-2.0 GNU General Public License, version 2 ( GPL-2.0 )
- * 
- * This program is free software; you can redistribute it and/or modify 
- * it under the terms of the GNU General Public License, version 2, as  
- * published by the Free Software Foundation.                           
  *
- * This program is distributed in the hope that it will be useful,      
- * but WITHOUT ANY WARRANTY; without even the implied warranty of       
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the        
- * GNU General Public License for more details.                         
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License, version 2, as
+ * published by the Free Software Foundation.
  *
- * You should have received a copy of the GNU General Public License    
- * along with this program; if not, write to the Free Software          
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,               
- * MA 02110-1301 USA                                                    
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston,
+ * MA 02110-1301 USA
  *
  */
 
@@ -46,7 +46,7 @@ class CoursePress_Capabilities {
 			'coursepress_create_course_cap'							 => 1,
 			'coursepress_update_course_cap'							 => 1,
 			'coursepress_update_my_course_cap'						 => 1,
-			'coursepress_update_all_courses_cap'					 => 0, // NOT IMPLEMENTED YET				
+			'coursepress_update_all_courses_cap'					 => 0, // NOT IMPLEMENTED YET
 			'coursepress_delete_course_cap'							 => 0,
 			'coursepress_delete_my_course_cap'						 => 1,
 			'coursepress_delete_all_courses_cap'					 => 0, // NOT IMPLEMENTED YET
@@ -58,7 +58,7 @@ class CoursePress_Capabilities {
 			'coursepress_view_all_units_cap'						 => 0,
 			'coursepress_update_course_unit_cap'					 => 1,
 			'coursepress_update_my_course_unit_cap'					 => 1,
-			'coursepress_update_all_courses_unit_cap'				 => 0, // NOT IMPLEMENTED YET					
+			'coursepress_update_all_courses_unit_cap'				 => 0, // NOT IMPLEMENTED YET
 			'coursepress_delete_course_units_cap'					 => 1,
 			'coursepress_delete_my_course_units_cap'				 => 1,
 			'coursepress_delete_all_courses_units_cap'				 => 0, // NOT IMPLEMENTED YET
@@ -116,14 +116,20 @@ class CoursePress_Capabilities {
 			/* Course Categories */
 			'coursepress_course_categories_manage_terms_cap'		 => 1,
 			'coursepress_course_categories_edit_terms_cap'			 => 1,
-			'coursepress_course_categories_delete_terms_cap'		 => 0
+			'coursepress_course_categories_delete_terms_cap'		 => 0,
+			/* Posts and Pages */
+			'edit_pages'											 => 0,
+			'edit_published_pages'									 => 0,
+			'edit_posts'											 => 0,
+			'publish_pages'											 => 0,
+			'publish_posts'											 => 0
 		),
 	);
 
 	/**
 	 * Constructor
 	 *
-	 * @since 1.2.3.3 
+	 * @since 1.2.3.3
 	 */
 	function __construct() {
 
@@ -132,7 +138,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Assign appropriate CoursePress capabilities for roles  
+	 * Assign appropriate CoursePress capabilities for roles
 	 *
 	 * @since 1.2.3.3.
 	 *
@@ -174,7 +180,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user create a course?  
+	 * Can the user create a course?
 	 *
 	 * @since 1.0.0
 	 *
@@ -191,7 +197,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user create a course?  
+	 * Can the user create a course?
 	 *
 	 * @since 1.0.0
 	 *
@@ -206,7 +212,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user update this course? 
+	 * Can the user update this course?
 	 *
 	 * @since 1.0.0
 	 *
@@ -230,7 +236,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user delete this course? 
+	 * Can the user delete this course?
 	 *
 	 * @since 1.0.0
 	 *
@@ -249,7 +255,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user change the course status? 
+	 * Can the user change the course status?
 	 *
 	 * @since 1.0.0
 	 *
@@ -272,7 +278,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user create units? 
+	 * Can the user create units?
 	 *
 	 * @since 1.0.0
 	 *
@@ -288,7 +294,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user create units in this course? 
+	 * Can the user create units in this course?
 	 *
 	 * @since 1.0.0
 	 *
@@ -307,7 +313,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user view units? 
+	 * Can the user view units?
 	 *
 	 * @since 1.0.0
 	 *
@@ -324,7 +330,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user update the units? 
+	 * Can the user update the units?
 	 *
 	 * @since 1.0.0
 	 *
@@ -349,7 +355,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user delete the units? 
+	 * Can the user delete the units?
 	 *
 	 * @since 1.0.0
 	 *
@@ -367,7 +373,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user change the unit state? 
+	 * Can the user change the unit state?
 	 *
 	 * @since 1.0.0
 	 *
@@ -392,7 +398,7 @@ class CoursePress_Capabilities {
 	}
 
 	/**
-	 * Can the user assign a course instructor? 
+	 * Can the user assign a course instructor?
 	 *
 	 * @since 1.0.0
 	 *
@@ -410,11 +416,11 @@ class CoursePress_Capabilities {
 
 		$my_course = self::is_course_instructor( $course_id, $user_id );
 
-		return ($my_course && user_can( $user_id, 'coursepress_assign_and_assign_instructor_my_course_cap' ) ) || user_can( $user_id, 'coursepress_assign_and_assign_instructor_course_cap' ) || user_can( $user_id, 'manage_options' ) ? true : false;
+		return ( $my_course && user_can( $user_id, 'coursepress_assign_and_assign_instructor_my_course_cap' ) ) || user_can( $user_id, 'coursepress_assign_and_assign_instructor_course_cap' ) || user_can( $user_id, 'manage_options' ) ? true : false;
 	}
 
 	/**
-	 * Can the user invite students? 
+	 * Can the user invite students?
 	 *
 	 * @since 1.0.0
 	 *
@@ -427,7 +433,7 @@ class CoursePress_Capabilities {
 
 		$my_course = self::is_course_instructor( $course_id, $user_id );
 
-		return ($my_course && user_can( $user_id, 'coursepress_invite_my_students_cap' ) ) || user_can( $user_id, 'coursepress_invite_students_cap' ) || user_can( $user_id, 'manage_options' ) ? true : false;
+		return ( $my_course && user_can( $user_id, 'coursepress_invite_my_students_cap' ) ) || user_can( $user_id, 'coursepress_invite_students_cap' ) || user_can( $user_id, 'manage_options' ) ? true : false;
 	}
 
 	/**
@@ -543,6 +549,7 @@ class CoursePress_Capabilities {
 		foreach ( $campus_conditions as $condition ) {
 			$is_campus |= function_exists( $condition ) && call_user_func( $condition );
 		}
+
 		return $is_campus;
 	}
 

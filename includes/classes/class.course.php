@@ -21,9 +21,9 @@
  * MA 02110-1301 USA
  *
  */
-
-if ( !defined( 'ABSPATH' ) )
-	exit; // Exit if accessed directly
+if ( !defined( 'ABSPATH' ) ) {
+	exit;
+} // Exit if accessed directly
 
 if ( !class_exists( 'Course' ) ) {
 
@@ -77,7 +77,6 @@ if ( !class_exists( 'Course' ) ) {
 
 				// Cache the course object
 				self::cache( self::TYPE_COURSE, $this->id, $this->details );
-
 			};
 
 			/**
@@ -107,7 +106,7 @@ if ( !class_exists( 'Course' ) ) {
 					$course->post_title = __( 'Untitled', 'cp' );
 				}
 				if ( $course->post_status == 'private' || $course->post_status == 'draft' ) {
-					$course->post_status = __( 'unpublished', 'cp' );
+					$course->post_status = 'unpublished';
 				}
 
 				$course->allow_course_discussion = get_post_meta( $this->id, 'allow_course_discussion', true );
@@ -157,13 +156,11 @@ if ( !class_exists( 'Course' ) ) {
 				<li>
 					<ul>
 						<?php
-						$module = new Unit_Module();
-
 						foreach ( $units as $unit ) {
 							$unit_class	 = new Unit( $unit->ID );
 							$unit_pages	 = $unit_class->get_number_of_unit_pages();
 
-							$modules = $module->get_modules( $unit->ID );
+//					$modules = Unit_Module::get_modules( $unit->ID );
 
 							if ( isset( $show_unit[ $unit->ID ] ) && $show_unit[ $unit->ID ] == 'on' && $unit->post_status == 'publish' ) {
 								?>
@@ -181,7 +178,7 @@ if ( !class_exists( 'Course' ) ) {
 											<?php
 											if ( isset( $preview_unit[ $unit->ID ] ) && $preview_unit[ $unit->ID ] == 'on' ) {
 												?>
-												<a href="<?php echo $unit_class->get_permalink(); ?>?try" class="preview_option"><?php
+												<a href="<?php echo Unit::get_permalink( $unit->ID ); ?>?try" class="preview_option"><?php
 													if ( $try_title == '' ) {
 														_e( 'Try Now', 'cp' );
 													} else {
@@ -194,7 +191,7 @@ if ( !class_exists( 'Course' ) ) {
 
 									<ul>
 										<?php
-										for ( $i = 1; $i <= $unit_pages; $i++ ) {
+										for ( $i = 1; $i <= $unit_pages; $i ++ ) {
 											if ( isset( $show_page[ $unit->ID . '_' . $i ] ) && $show_page[ $unit->ID . '_' . $i ] == 'on' ) {
 												?>
 
@@ -206,18 +203,16 @@ if ( !class_exists( 'Course' ) ) {
 
 													<label for="page_<?php echo $unit->ID . '_' . $i; ?>">
 														<div class="tree-page-left">
-															<?php echo (isset( $page_title ) && $page_title !== '' ? $page_title : __( 'Untitled Page', 'cp' )); ?>
+															<?php echo( isset( $page_title ) && $page_title !== '' ? $page_title : __( 'Untitled Page', 'cp' ) ); ?>
 														</div>
 														<div class="tree-page-right">
-
 															<?php if ( $this->details->course_structure_time_display == 'on' ) { ?>
 																<span><?php echo $unit_class->get_unit_page_time_estimation( $unit->ID, $i ); ?></span>
 															<?php } ?>
-
 															<?php
 															if ( isset( $preview_page[ $unit->ID . '_' . $i ] ) && $preview_page[ $unit->ID . '_' . $i ] == 'on' ) {
 																?>
-																<a href="<?php echo $unit_class->get_permalink(); ?>page/<?php echo $i; ?>?try" class="preview_option"><?php
+																<a href="<?php echo Unit::get_permalink( $unit->ID ); ?>page/<?php echo $i; ?>?try" class="preview_option"><?php
 																	if ( $try_title == '' ) {
 																		_e( 'Try Now', 'cp' );
 																	} else {
@@ -229,8 +224,7 @@ if ( !class_exists( 'Course' ) ) {
 														</div>
 													</label>
 
-													<?php
-													?>
+													<?php ?>
 												</li>
 												<?php
 											}
@@ -449,9 +443,9 @@ if ( !class_exists( 'Course' ) ) {
 					if ( $course ) {
 						$post[ 'post_excerpt' ]	 = cp_filter_content( empty( $_POST[ 'course_excerpt' ] ) ? $course->post_excerpt : $_POST[ 'course_excerpt' ]  );
 						$post[ 'post_content' ]	 = cp_filter_content( empty( $_POST[ 'course_description' ] ) ? $course->post_content : $_POST[ 'course_description' ]  );
-						$post[ 'post_title' ]	 = cp_filter_content( (empty( $_POST[ 'course_name' ] ) ? $course->post_title : $_POST[ 'course_name' ] ), true );
-						if( ! empty( $_POST[ 'course_name' ] ) ) {
-							$post[ 'post_name' ] =  wp_unique_post_slug( sanitize_title( $post[ 'post_title' ] ), $course->ID, 'publish', 'course', 0 );
+						$post[ 'post_title' ]	 = cp_filter_content( ( empty( $_POST[ 'course_name' ] ) ? $course->post_title : $_POST[ 'course_name' ] ), true );
+						if ( !empty( $_POST[ 'course_name' ] ) ) {
+							$post[ 'post_name' ] = wp_unique_post_slug( sanitize_title( $post[ 'post_title' ] ), $course->ID, 'publish', 'course', 0 );
 						}
 					} else {
 						$new_course				 = true;
@@ -459,15 +453,23 @@ if ( !class_exists( 'Course' ) ) {
 						if ( isset( $_POST[ 'course_description' ] ) ) {
 							$post[ 'post_content' ] = cp_filter_content( $_POST[ 'course_description' ] );
 						}
-						$post[ 'post_title' ] = cp_filter_content( $_POST[ 'course_name' ], true );
-						$post[ 'post_name' ] =  wp_unique_post_slug( sanitize_title( $post[ 'post_title' ] ), 0, 'publish', 'course', 0 );
+						$post[ 'post_title' ]	 = cp_filter_content( $_POST[ 'course_name' ], true );
+						$post[ 'post_name' ]	 = wp_unique_post_slug( sanitize_title( $post[ 'post_title' ] ), 0, 'publish', 'course', 0 );
 					}
 
 					if ( isset( $_POST[ 'course_id' ] ) ) {
 						$post[ 'ID' ] = $_POST[ 'course_id' ]; //If ID is set, wp_insert_post will do the UPDATE instead of insert
 					}
 
-					$post_id = wp_insert_post( $post );
+					// Avoid ping backs
+					$post[ 'ping_status' ] = 'closed';
+
+					$post_id = wp_insert_post( apply_filters( 'coursepress_pre_insert_post', $post ) );
+
+					$course_order_exists = get_post_meta( $post_id, 'course_order', true );
+					if ( empty( $course_order_exists ) ) {
+						update_post_meta( $post_id, 'course_order', 0 );
+					}
 
 					// Clear cached object because we updated
 					self::kill( self::TYPE_COURSE, $post_id );
@@ -598,6 +600,7 @@ if ( !class_exists( 'Course' ) ) {
 						 * @since 1.2.1
 						 */
 						do_action( 'coursepress_course_delete_cancelled', $this->id );
+
 						return false;
 					}
 
@@ -660,18 +663,19 @@ if ( !class_exists( 'Course' ) ) {
 
 					$instructors	 = get_post_meta( $course_id, 'instructors', true );
 					$instructor_id_i = 0;
-					if ( isset( $instructors ) && ! empty( $instructors ) ) {
+					if ( isset( $instructors ) && !empty( $instructors ) ) {
 						foreach ( $instructors as $instructor_id ) {
 							$instructors[ $instructor_id_i ] = (int) $instructor_id; //make sure all are numeric values (it wasn't always the case, like for '1')
 							if ( $instructor_id == 0 ) {
 								unset( $instructors[ $instructor_id_i ] ); //remove zeros and empty values
 							}
 
-							$instructor_id_i++;
+							$instructor_id_i ++;
 						}
 					}
+
 					//re-index array
-					return ! empty( $instructors ) ? $instructors : array();
+					return !empty( $instructors ) ? $instructors : array();
 				}
 
 				static function get_course_students_ids( $course_id = false ) {
@@ -697,9 +701,10 @@ if ( !class_exists( 'Course' ) ) {
 					if ( isset( $wp_user_search ) ) {
 						foreach ( $wp_user_search->results as $student ) {
 							$students[ $student_id_i ] = (int) $student->ID; //make sure all are numeric values (it wasn't always the case, like for '1')
-							$student_id_i++;
+							$student_id_i ++;
 						}
 					}
+
 					//re-index array
 					return array_values( $students );
 				}
@@ -801,6 +806,7 @@ if ( !class_exists( 'Course' ) ) {
 					if ( $course_id == '' ) {
 						$course_id = $this->id;
 					}
+
 					return get_permalink( $course_id );
 				}
 
@@ -816,6 +822,7 @@ if ( !class_exists( 'Course' ) ) {
 					$course	 = $course->get_course();
 
 					$unit_permalink = home_url() . '/' . $course_slug . '/' . $course->post_name . '/' . $units_slug . '/' . $this->details->post_name . '/';
+
 					return $unit_permalink;
 				}
 
@@ -839,6 +846,7 @@ if ( !class_exists( 'Course' ) ) {
 					);
 
 					$wp_user_search = new WP_User_Query( $args );
+
 					return count( $wp_user_search->get_results() );
 				}
 
@@ -879,7 +887,7 @@ if ( !class_exists( 'Course' ) ) {
 					$args = array(
 						'author'		 => $user_id,
 						'post_type'		 => 'mp_order',
-						'post_status'	 => 'order_paid',
+						'post_status'	 => apply_filters( 'cp_is_user_purchased_mp_order_status', 'order_paid' ),
 						'posts_per_page' => '-1'
 					);
 
@@ -917,6 +925,7 @@ if ( !class_exists( 'Course' ) ) {
 						 * @since 1.2.1
 						 */
 						do_action( 'coursepress_course_duplicate_cancelled', $course_id );
+
 						return false;
 					}
 
@@ -989,7 +998,42 @@ if ( !class_exists( 'Course' ) ) {
 					$this->full					 = $this->is_populated();
 				}
 
+				public static function get_allowed_pages( $course_id ) {
+
+					$pages = array(
+						'course_discussion'	 => get_post_meta( $course_id, 'allow_course_discussion', true ),
+						'workbook'			 => get_post_meta( $course_id, 'allow_workbook_page', true ),
+					);
+
+					return $pages;
+				}
+
+				public static function get_course_time_estimation( $course_id, $status = 'any' ) {
+
+		            $course_time = '';
+		            $course_seconds = 0;
+		            $units = Unit::get_units_from_course( $course_id, $status, false );
+
+		            foreach ( $units as $unit ) {
+		                $unit_details	 = new Unit( $unit->ID );
+		                $unit_time = $unit_details->get_unit_time_estimation($unit->ID);
+
+		                $min_sec = explode( ':', $unit_time );
+		                if ( isset( $min_sec[0] ) ) {
+		                    $course_seconds += intval( $min_sec[0] ) * 60;
+		                }
+		                if ( isset( $min_sec[1] ) ) {
+		                    $course_seconds += intval( substr($min_sec[1], 0, 2) );
+		                }
+		            }
+		            $total_seconds = round($course_seconds);
+		            $formatted_time = sprintf('%02d:%02d:%02d', ($total_seconds/3600),($total_seconds/60%60), $total_seconds%60);
+
+		            $course_time = apply_filters( 'coursepress_course_get_time_estimation', $formatted_time, $total_seconds, $course_id );
+
+		            return $course_time;
+		        }
+
 			}
 
 		}
-		?>
