@@ -80,6 +80,9 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.5.2 =
+* Fix missing class error for CoursePress Standard.
+
 = 1.2.5.1 =
 * Added basic certificate functionality to CoursePress Pro (templates planned for future release).
 * Added additional capabilities for instructors
