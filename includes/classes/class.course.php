@@ -66,16 +66,16 @@ if ( !class_exists( 'Course' ) ) {
 			$this->id		 = $id;
 			$this->output	 = $output;
 
-			// Attempt to load from cache or create new cache object
+// Attempt to load from cache or create new cache object
 			if ( !self::load( self::TYPE_COURSE, $this->id, $this->details ) ) {
 
-				// Get the course
+// Get the course
 				$this->details = get_post( $this->id, $this->output );
 
-				// Initialize the course
+// Initialize the course
 				$this->init_course( $this->details );
 
-				// Cache the course object
+// Cache the course object
 				self::cache( self::TYPE_COURSE, $this->id, $this->details );
 			};
 
@@ -87,7 +87,7 @@ if ( !class_exists( 'Course' ) ) {
 			do_action( 'coursepress_course_init', $this );
 		}
 
-		// PHP legacy constructor
+// PHP legacy constructor
 		function Course( $id = '', $output = 'OBJECT' ) {
 			$this->__construct( $id, $output );
 		}
@@ -247,7 +247,7 @@ if ( !class_exists( 'Course' ) ) {
 				}
 
 				function is_open_ended() {
-
+					
 				}
 
 				static function get_course_featured_url( $course_id = false ) {
@@ -348,6 +348,7 @@ if ( !class_exists( 'Course' ) ) {
 					);
 
 					$products = get_posts( $args );
+
 					if ( isset( $products[ 0 ] ) ) {
 						return (int) $products[ 0 ];
 					} else {
@@ -356,10 +357,15 @@ if ( !class_exists( 'Course' ) ) {
 				}
 
 				function update_mp_product( $course_id = false ) {
+
 					$course_id				 = $course_id ? $course_id : $this->id;
 					$automatic_sku_number	 = 'CP-' . $course_id;
 
-					$mp_product_id = $this->mp_product_id( $course_id );
+					if ( cp_use_woo() ) {
+						$mp_product_id = CP_WooCommerce_Integration::woo_product_id( $course_id );
+					} else {
+						$mp_product_id = $this->mp_product_id( $course_id );
+					}
 
 					$post = array(
 						'post_status'	 => 'publish',
@@ -388,27 +394,54 @@ if ( !class_exists( 'Course' ) ) {
 							$sku[ 0 ] = cp_filter_content( (!empty( $_POST[ 'mp_sku' ] ) ? $_POST[ 'mp_sku' ] : '' ), true );
 						}
 
-						update_post_meta( $this->id, 'mp_product_id', $post_id );
-						update_post_meta( $this->id, 'marketpress_product', $post_id );
+						if ( cp_use_woo() ) {
+							update_post_meta( $this->id, 'woo_product_id', $post_id );
+							update_post_meta( $this->id, 'woo_product', $post_id );
 
-						$price		 = cp_filter_content( (!empty( $_POST[ 'mp_price' ] ) ? $_POST[ 'mp_price' ] : 0 ), true );
-						$sale_price	 = cp_filter_content( (!empty( $_POST[ 'mp_sale_price' ] ) ? $_POST[ 'mp_sale_price' ] : 0 ), true );
-						update_post_meta( $post_id, 'mp_sku', $sku );
-						update_post_meta( $post_id, 'mp_var_name', serialize( array() ) );
-						update_post_meta( $post_id, 'mp_price', $price );
-						update_post_meta( $post_id, 'mp_sale_price', $sale_price );
-						update_post_meta( $post_id, 'mp_is_sale', cp_filter_content( (!empty( $_POST[ 'mp_is_sale' ] ) ? $_POST[ 'mp_is_sale' ] : '' ), true ) );
-						update_post_meta( $post_id, 'mp_file', get_permalink( $this->id ) );
-						update_post_meta( $post_id, 'cp_course_id', $this->id );
+							$price		 = cp_filter_content( (!empty( $_POST[ 'mp_price' ] ) ? $_POST[ 'mp_price' ] : 0 ), true );
+							$sale_price	 = cp_filter_content( (!empty( $_POST[ 'mp_sale_price' ] ) ? $_POST[ 'mp_sale_price' ] : 0 ), true );
 
+							update_post_meta( $post_id, '_virtual', 'yes' );
+							update_post_meta( $post_id, '_sold_individually', 'yes' );
+							update_post_meta( $post_id, '_sku', $sku[ 0 ] );
+							update_post_meta( $post_id, '_regular_price', $price );
+
+							if ( !empty( $_POST[ 'mp_is_sale' ] ) ) {
+								update_post_meta( $post_id, '_sale_price', $sale_price );
+								update_post_meta( $post_id, '_price', $sale_price );
+							}else{
+								update_post_meta( $post_id, '_price', $price );
+							}
+
+							update_post_meta( $post_id, 'mp_is_sale', cp_filter_content( (!empty( $_POST[ 'mp_is_sale' ] ) ? $_POST[ 'mp_is_sale' ] : '' ), true ) );
+							update_post_meta( $post_id, 'cp_course_id', $this->id );
+						} else {
+							update_post_meta( $this->id, 'mp_product_id', $post_id );
+							update_post_meta( $this->id, 'marketpress_product', $post_id );
+
+							$price		 = cp_filter_content( (!empty( $_POST[ 'mp_price' ] ) ? $_POST[ 'mp_price' ] : 0 ), true );
+							$sale_price	 = cp_filter_content( (!empty( $_POST[ 'mp_sale_price' ] ) ? $_POST[ 'mp_sale_price' ] : 0 ), true );
+							update_post_meta( $post_id, 'mp_sku', $sku );
+							update_post_meta( $post_id, 'mp_var_name', serialize( array() ) );
+							update_post_meta( $post_id, 'mp_price', $price );
+							update_post_meta( $post_id, 'mp_sale_price', $sale_price );
+							update_post_meta( $post_id, 'mp_is_sale', cp_filter_content( (!empty( $_POST[ 'mp_is_sale' ] ) ? $_POST[ 'mp_is_sale' ] : '' ), true ) );
+							update_post_meta( $post_id, 'mp_file', get_permalink( $this->id ) );
+							update_post_meta( $post_id, 'cp_course_id', $this->id );
+						}
 						// Remove product if its not a paid course (clean up MarketPress products)
 					} elseif ( isset( $_POST[ 'meta_paid_course' ] ) && 'off' == $_POST[ 'meta_paid_course' ] ) {
 						if ( $mp_product_id && 0 != $mp_product_id ) {
 							if ( get_post_type( $mp_product_id ) == 'product' ) {
 								wp_delete_post( $mp_product_id );
 							}
-							delete_post_meta( $this->id, 'mp_product_id' );
-							delete_post_meta( $this->id, 'marketpress_product' );
+							if ( cp_use_woo() ) {
+								delete_post_meta( $this->id, 'woo_product_id' );
+								delete_post_meta( $this->id, 'woo_product' );
+							} else {
+								delete_post_meta( $this->id, 'mp_product_id' );
+								delete_post_meta( $this->id, 'marketpress_product' );
+							}
 						}
 					}
 				}
@@ -467,6 +500,7 @@ if ( !class_exists( 'Course' ) ) {
 					$post_id = wp_insert_post( apply_filters( 'coursepress_pre_insert_post', $post ) );
 
 					$course_order_exists = get_post_meta( $post_id, 'course_order', true );
+
 					if ( empty( $course_order_exists ) ) {
 						update_post_meta( $post_id, 'course_order', 0 );
 					}
@@ -501,7 +535,7 @@ if ( !class_exists( 'Course' ) ) {
 								}
 							} // meta_course_category
 							//Add featured image
-							if ( ( 'meta_featured_url' == $key || '_thumbnail_id' == $key ) && ( isset( $_POST[ '_thumbnail_id' ] ) && is_numeric( $_POST[ '_thumbnail_id' ] ) || isset( $_POST[ 'meta_featured_url' ] ) && $_POST[ 'meta_featured_url' ] !== '' ) ) {
+							if ( ( 'meta_featured_url' == $key || '_thumbnail_id' == $key ) && ( isset( $_POST[ '_thumbnail_id' ] ) && is_numeric( $_POST[ '_thumbnail_id' ] ) || isset( $_POST[ 'meta_featured _url' ] ) && $_POST[ 'meta_featured_url' ] !== '' ) ) {
 
 								$course_image_width	 = get_option( 'course_image_width', 235 );
 								$course_image_height = get_option( 'course_image_height', 225 );
@@ -640,7 +674,7 @@ if ( !class_exists( 'Course' ) ) {
 					/**
 					 * Perform actions after a course is deleted.
 					 *
-					 * @var $course  The course object if the ID or post_title is needed.
+					 * @var $course  The course object if the ID or post_ title is needed.
 					 *
 					 * @since 1.2.1
 					 */
@@ -956,7 +990,7 @@ if ( !class_exists( 'Course' ) ) {
 						}
 					}
 
-					delete_post_meta( $new_course_id, 'meta_mp_product_id' );
+					delete_post_meta( $new_course_id, 'me ta_mp_pr oduct_id' );
 					delete_post_meta( $new_course_id, 'mp_product_id' );
 					delete_post_meta( $new_course_id, 'mp_sale_price' );
 					delete_post_meta( $new_course_id, 'mp_price' );
@@ -1010,30 +1044,64 @@ if ( !class_exists( 'Course' ) ) {
 
 				public static function get_course_time_estimation( $course_id, $status = 'any' ) {
 
-		            $course_time = '';
-		            $course_seconds = 0;
-		            $units = Unit::get_units_from_course( $course_id, $status, false );
+					$course_time	 = '';
+					$course_seconds	 = 0;
+					$units			 = Unit::get_units_from_course( $course_id, $status, false );
 
-		            foreach ( $units as $unit ) {
-		                $unit_details	 = new Unit( $unit->ID );
-		                $unit_time = $unit_details->get_unit_time_estimation($unit->ID);
+					foreach ( $units as $unit ) {
+						$unit_details	 = new Unit( $unit->ID );
+						$unit_time		 = $unit_details->get_unit_time_estimation( $unit->ID );
 
-		                $min_sec = explode( ':', $unit_time );
-		                if ( isset( $min_sec[0] ) ) {
-		                    $course_seconds += intval( $min_sec[0] ) * 60;
-		                }
-		                if ( isset( $min_sec[1] ) ) {
-		                    $course_seconds += intval( substr($min_sec[1], 0, 2) );
-		                }
-		            }
-		            $total_seconds = round($course_seconds);
-		            $formatted_time = sprintf('%02d:%02d:%02d', ($total_seconds/3600),($total_seconds/60%60), $total_seconds%60);
+						$min_sec = explode( ':', $unit_time );
+						if ( isset( $min_sec[ 0 ] ) ) {
+							$course_seconds += intval( $min_sec[ 0 ] ) * 60;
+						}
+						if ( isset( $min_sec[ 1 ] ) ) {
+							$course_seconds += intval( substr( $min_sec[ 1 ], 0, 2 ) );
+						}
+					}
+					$total_seconds	 = round( $course_seconds );
+					$formatted_time	 = sprintf( '%02d:%02d:%02d', ($total_seconds / 3600 ), ($total_seconds / 60 % 60 ), $total_seconds % 60 );
 
-		            $course_time = apply_filters( 'coursepress_course_get_time_estimation', $formatted_time, $total_seconds, $course_id );
+					$course_time = apply_filters( 'coursepress_course_get_time_estimation', $formatted_time, $total_seconds, $course_id );
 
-		            return $course_time;
-		        }
+					return $course_time;
+				}
 
 			}
 
-		}
+		} 
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							
+
+							 

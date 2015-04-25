@@ -80,6 +80,17 @@ You can find [in-depth setup and usage instructions with screenshots here »](ht
 
 == Changelog ==
 
+= 1.2.5.4 =
+* Fixed issue with marking a order as paid with Manual Payments
+* Fixed issue with Virtual pages
+* Added additional hooks for developers
+* Integration with WooCommerce (CoursePress > Settings > WooCommerce Integration)
+
+= 1.2.5.3 =
+* Security Update: Fixed possible WordPress XSS bug
+* Fixed clearfix div
+* Fixed broken virtual pages
+
 = 1.2.5.2 =
 * Fix missing class error for CoursePress Standard.
 
